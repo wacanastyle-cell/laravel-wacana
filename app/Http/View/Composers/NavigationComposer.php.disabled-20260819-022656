@@ -1,0 +1,130 @@
+<?php
+
+namespace App\Http\View\Composers;
+
+use App\Models\Page;
+use Illuminate\View\View;
+
+class NavigationComposer
+{
+    public function compose(View $view): void
+    {
+        /*
+         * Ambil halaman ABOUT dari database.
+         * Jangan membuat data baru. Gunakan data yang sudah
+         * tersedia pada Admin Panel.
+         */
+        $aboutPages = Page::query()
+            ->whereIn('slug', [
+                'peraturan-tim',
+                'tentang-kami',
+                'kebijakan-privasi',
+                'syarat-ketentuan',
+            ])
+            ->get()
+            ->keyBy('slug');
+
+        $aboutItems = [];
+
+        $pageOrder = [
+            'peraturan-tim'      => 'PERATURAN TIM',
+            'tentang-kami'       => 'TENTANG KAMI',
+            'kebijakan-privasi'  => 'KEBIJAKAN PRIVASI',
+            'syarat-ketentuan'   => 'SYARAT & KETENTUAN',
+        ];
+
+        foreach ($pageOrder as $slug => $label) {
+            if ($aboutPages->has($slug) && \Route::has('public.page')) {
+                $page = $aboutPages->get($slug);
+
+                $aboutItems[] = [
+                    'label' => $label,
+                    'type' => 'link',
+                    'route' => 'public.page',
+                    'url' => route('public.page', $page->slug),
+                ];
+            }
+        }
+
+        /*
+         * FAQ sudah mempunyai sistem sendiri.
+         * Jangan membuat Page baru untuk FAQ.
+         */
+        if (\Route::has('public.faqs')) {
+            $aboutItems[] = [
+                'label' => 'FAQ',
+                'type' => 'link',
+                'route' => 'public.faqs',
+                'url' => route('public.faqs'),
+            ];
+        }
+
+        $navItems = [];
+
+        if (\Route::has('home')) {
+            $navItems[] = [
+                'label' => 'HOME',
+                'type' => 'link',
+                'route' => 'home',
+                'url' => route('home'),
+            ];
+        }
+
+        if (\Route::has('public.members')) {
+            $navItems[] = [
+                'label' => 'ANGGOTA',
+                'type' => 'link',
+                'route' => 'public.members',
+                'url' => route('public.members'),
+            ];
+        }
+
+        if (\Route::has('public.galleries')) {
+            $navItems[] = [
+                'label' => 'GALERI',
+                'type' => 'link',
+                'route' => 'public.galleries',
+                'url' => route('public.galleries'),
+            ];
+        }
+
+        /*
+         * Gunakan route formulir yang memang sudah dipakai
+         * oleh header sebelumnya.
+         */
+        if (\Route::has('public.form.show')) {
+            $navItems[] = [
+                'label' => 'FORMULIR',
+                'type' => 'link',
+                'route' => 'public.form.show',
+                'url' => route('public.form.show', 'open-po-jaket'),
+            ];
+        } elseif (\Route::has('public.forms')) {
+            $navItems[] = [
+                'label' => 'FORMULIR',
+                'type' => 'link',
+                'route' => 'public.forms',
+                'url' => route('public.forms'),
+            ];
+        }
+
+        if (\Route::has('public.blogs')) {
+            $navItems[] = [
+                'label' => 'BLOG',
+                'type' => 'link',
+                'route' => 'public.blogs',
+                'url' => route('public.blogs'),
+            ];
+        }
+
+        if (!empty($aboutItems)) {
+            $navItems[] = [
+                'label' => 'ABOUT',
+                'type' => 'dropdown',
+                'items' => $aboutItems,
+            ];
+        }
+
+        $view->with('wsNavLinks', $navItems);
+    }
+}

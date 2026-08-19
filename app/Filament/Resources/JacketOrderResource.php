@@ -1,0 +1,228 @@
+<?php
+
+namespace App\Filament\Resources;
+
+use App\Filament\Resources\JacketOrderResource\Pages;
+use App\Models\JacketOrder;
+use Filament\Forms;
+use Filament\Forms\Form;
+use Filament\Resources\Resource;
+use Filament\Tables;
+use Filament\Tables\Table;
+
+class JacketOrderResource extends Resource
+{
+    protected static ?string $model = JacketOrder::class;
+
+    protected static ?string $navigationIcon = 'heroicon-o-shopping-cart';
+
+    protected static ?string $navigationGroup = 'Orders & Forms';
+
+    protected static ?string $navigationLabel = 'Jacket Orders';
+
+    protected static ?string $title = 'Jacket Orders';
+
+    public static function form(Form $form): Form
+    {
+        return $form
+            ->schema([
+                Forms\Components\Section::make('Order Information')
+                    ->schema([
+                        Forms\Components\TextInput::make('order_number')
+                            ->label('Order Number')
+                            ->disabled()
+                            ->helperText('Generated automatically'),
+
+                        Forms\Components\Select::make('status')
+                            ->label('Status')
+                            ->options([
+                                'new' => 'New',
+                                'processing' => 'Processing',
+                                'confirmed' => 'Confirmed',
+                                'completed' => 'Completed',
+                                'cancelled' => 'Cancelled',
+                            ])
+                            ->required(),
+
+                        Forms\Components\DateTimePicker::make('ordered_at')
+                            ->label('Order Date')
+                            ->disabled(),
+
+                        Forms\Components\DateTimePicker::make('confirmed_at')
+                            ->label('Confirmed Date'),
+
+                        Forms\Components\DateTimePicker::make('completed_at')
+                            ->label('Completed Date'),
+                    ])->columns(2),
+
+                Forms\Components\Section::make('Customer Information')
+                    ->schema([
+                        Forms\Components\TextInput::make('customer_name')
+                            ->label('Customer Name')
+                            ->required()
+                            ->maxLength(255),
+
+                        Forms\Components\TextInput::make('customer_phone')
+                            ->label('Phone Number')
+                            ->required()
+                            ->tel()
+                            ->maxLength(20),
+
+                        Forms\Components\TextInput::make('customer_email')
+                            ->label('Email Address')
+                            ->email()
+                            ->maxLength(255),
+
+                        Forms\Components\TextInput::make('customer_address')
+                            ->label('Address')
+                            ->maxLength(255)
+                            ->columnSpan(2),
+                    ])->columns(2),
+
+                Forms\Components\Section::make('Jacket Details')
+                    ->schema([
+                        Forms\Components\TextInput::make('jacket_type')
+                            ->label('Jacket Type')
+                            ->required()
+                            ->placeholder('e.g., Kulit, Bahan, Hoodie')
+                            ->maxLength(255),
+
+                        Forms\Components\TextInput::make('jacket_model')
+                            ->label('Model')
+                            ->placeholder('e.g., Standard, Classic, Racing')
+                            ->maxLength(255),
+
+                        Forms\Components\TextInput::make('total_quantity')
+                            ->label('Total Quantity')
+                            ->numeric()
+                            ->default(1)
+                            ->required(),
+
+                        Forms\Components\TextInput::make('estimated_total')
+                            ->label('Estimated Total (IDR)')
+                            ->numeric()
+                            ->prefix('Rp')
+                            ->step(1000),
+                    ])->columns(2),
+
+                Forms\Components\Section::make('Colors & Sizes')
+                    ->schema([
+                        Forms\Components\KeyValue::make('colors')
+                            ->label('Colors')
+                            ->keyLabel('Color Name')
+                            ->valueLabel('Quantity'),
+
+                        Forms\Components\KeyValue::make('sizes')
+                            ->label('Sizes')
+                            ->keyLabel('Size')
+                            ->valueLabel('Quantity'),
+                    ])->columns(2),
+
+                Forms\Components\Section::make('Design & Notes')
+                    ->schema([
+                        Forms\Components\TextInput::make('design_reference')
+                            ->label('Design Reference')
+                            ->placeholder('File path or reference number')
+                            ->maxLength(255),
+
+                        Forms\Components\Textarea::make('notes')
+                            ->label('Additional Notes')
+                            ->rows(4)
+                            ->columnSpan(2),
+                    ]),
+            ]);
+    }
+
+    public static function table(Table $table): Table
+    {
+        return $table
+            ->columns([
+                Tables\Columns\TextColumn::make('order_number')
+                    ->label('Order #')
+                    ->searchable()
+                    ->sortable()
+                    ->copyable(),
+
+                Tables\Columns\TextColumn::make('customer_name')
+                    ->label('Customer')
+                    ->searchable()
+                    ->sortable(),
+
+                Tables\Columns\TextColumn::make('customer_phone')
+                    ->label('Phone')
+                    ->searchable()
+                    ->copyable(),
+
+                Tables\Columns\TextColumn::make('jacket_type')
+                    ->label('Jacket Type')
+                    ->sortable(),
+
+                Tables\Columns\TextColumn::make('total_quantity')
+                    ->label('Qty')
+                    ->numeric()
+                    ->sortable(),
+
+                Tables\Columns\BadgeColumn::make('status')
+                    ->label('Status')
+                    ->color(function (string $state): string {
+                        return match ($state) {
+                            'new' => 'info',
+                            'processing' => 'warning',
+                            'confirmed' => 'success',
+                            'completed' => 'success',
+                            'cancelled' => 'danger',
+                            default => 'gray',
+                        };
+                    })
+                    ->sortable(),
+
+                Tables\Columns\TextColumn::make('ordered_at')
+                    ->label('Order Date')
+                    ->dateTime('d M Y H:i')
+                    ->sortable()
+                    ->toggleable(),
+
+                Tables\Columns\TextColumn::make('created_at')
+                    ->label('Created')
+                    ->dateTime('d M Y')
+                    ->sortable()
+                    ->toggleable(isToggledHiddenByDefault: true),
+            ])
+            ->filters([
+                Tables\Filters\SelectFilter::make('status')
+                    ->options([
+                        'new' => 'New',
+                        'processing' => 'Processing',
+                        'confirmed' => 'Confirmed',
+                        'completed' => 'Completed',
+                        'cancelled' => 'Cancelled',
+                    ]),
+            ])
+            ->actions([
+                Tables\Actions\ViewAction::make(),
+                Tables\Actions\EditAction::make(),
+                Tables\Actions\DeleteAction::make(),
+            ])
+            ->bulkActions([
+                Tables\Actions\BulkActionGroup::make([
+                    Tables\Actions\DeleteBulkAction::make(),
+                ]),
+            ])
+            ->defaultSort('ordered_at', 'desc');
+    }
+
+    public static function getRelations(): array
+    {
+        return [];
+    }
+
+    public static function getPages(): array
+    {
+        return [
+            'index' => Pages\ListJacketOrders::route('/'),
+            'create' => Pages\CreateJacketOrder::route('/create'),
+            'view' => Pages\ViewJacketOrder::route('/{record}'),
+            'edit' => Pages\EditJacketOrder::route('/{record}/edit'),
+        ];
+    }
+}

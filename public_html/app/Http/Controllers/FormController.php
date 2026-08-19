@@ -1,0 +1,150 @@
+<?php
+
+namespace App\Http\Controllers;
+
+use App\Mail\AdminFormSubmissionNotification;
+use App\Mail\FormSubmissionConfirmation;
+use App\Models\Form;
+use App\Models\FormField;
+use App\Models\FormSubmission;
+use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Mail;
+use Illuminate\Support\Str;
+
+class FormController extends Controller
+{
+    public function index()
+    {
+        $forms = Form::query()
+            ->where('status', 'open')
+            ->orderBy('created_at', 'desc')
+            ->get();
+
+        return view('public.forms.index', compact('forms'));
+    }
+
+    public function show(string $slug)
+    {
+        $form = Form::query()
+            ->where('slug', $slug)
+            ->whereIn('status', ['open', 'draft'])
+            ->firstOrFail();
+
+        if ($form->status !== 'open') {
+            abort(403, 'Formulir belum dibuka untuk publik.');
+        }
+
+        return view('public.forms.show', compact('form'));
+    }
+
+    public function store(Request $request, string $slug)
+    {
+        $form = Form::query()->where('slug', $slug)->where('status', 'open')->firstOrFail();
+
+        $rules = [];
+        foreach ($form->fields as $field) {
+            $rules[$field->name] = $this->fieldRules($field);
+        }
+
+        $request->validate($rules);
+
+        $submissionData = [];
+        foreach ($form->fields as $field) {
+            $fieldName = $field->name;
+            $value = $request->input($fieldName);
+
+            if ($request->hasFile($fieldName)) {
+                $file = $request->file($fieldName);
+                $path = $file->storePubliclyAs(
+                    'form-uploads/' . $form->id,
+                    Str::slug(pathinfo($file->getClientOriginalName(), PATHINFO_FILENAME), '-') . '-' . time() . '.' . $file->getClientOriginalExtension(),
+                    'public'
+                );
+                $value = $path;
+            }
+
+            if ($field->type === 'checkbox') {
+                $value = $request->input($fieldName, []);
+            }
+
+            if ($field->type === 'select' && is_array($value)) {
+                $value = implode(', ', $value);
+            }
+
+            if ($field->type === 'radio') {
+                $value = (string) $value;
+            }
+
+            if ($field->type === 'number') {
+                $value = $value !== null ? (string) $value : null;
+            }
+
+            $submissionData[$fieldName] = $value;
+        }
+
+        $submitterName = $request->input('submitter_name')
+            ?? $request->input('riderName') // Menggunakan nama field dari HTML form
+            ?? $request->input('name')
+            ?? $request->input('full_name')
+            ?? 'Pengisi Form';
+
+        $submitterEmail = $request->input('submitter_email')
+            ?? $request->input('email');
+
+        $submitterPhone = $request->input('submitter_phone')
+            ?? $request->input('riderContact') // Menggunakan nama field dari HTML form
+            ?? $request->input('phone');
+
+        $submission = FormSubmission::create([
+            'form_id' => $form->id,
+            'reference_number' => FormSubmission::generateReferenceNumber(),
+            'submitter_name' => $submitterName,
+            'submitter_email' => $submitterEmail,
+            'submitter_phone' => $submitterPhone,
+            'data' => $submissionData,
+            'status' => 'new',
+            'submitted_at' => now(),
+        ]);
+
+        if ($form->email_notification_enabled && ! empty($submitterEmail)) {
+            Mail::to($submitterEmail)->send(new FormSubmissionConfirmation($submission));
+        }
+
+        if ($form->admin_notification_enabled) {
+            $adminEmails = config('mail.admin_addresses', ['admin@wacanastyle.my.id']);
+            foreach ($adminEmails as $adminEmail) {
+                Mail::to($adminEmail)->send(new AdminFormSubmissionNotification($submission));
+            }
+        }
+
+        return redirect()->route('public.form.show', $form->slug)->with('success', $form->confirmation_message ?? 'Formulir berhasil dikirim.');
+    }
+
+    protected function fieldRules(FormField $field): array
+    {
+        $rules = [];
+
+        if ($field->is_required) {
+            $rules[] = 'required';
+        }
+
+        $fieldRules = is_array($field->validation_rules) ? $field->validation_rules : json_decode($field->validation_rules ?? '[]', true);
+        if (is_array($fieldRules)) {
+            $rules = array_merge($rules, $fieldRules);
+        }
+
+        $typeRules = match ($field->type) {
+            'email' => ['email'],
+            'phone' => ['string', 'max:50'],
+            'number' => ['numeric'],
+            'date' => ['date'],
+            'select', 'radio' => ['string'],
+            'checkbox' => ['array'],
+            'file' => ['file', 'mimes:jpg,jpeg,png,webp,pdf,doc,docx', 'max:2048'],
+            'image' => ['image', 'mimes:jpg,jpeg,png,webp', 'max:2048'],
+            default => ['string'],
+        };
+
+        return array_values(array_filter(array_merge($rules, $typeRules, $field->is_required ? ['sometimes'] : ['nullable'])));
+    }
+}
