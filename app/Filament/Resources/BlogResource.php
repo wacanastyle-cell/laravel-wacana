@@ -8,7 +8,6 @@ use App\Models\Blog;
 use Filament\Forms;
 use Filament\Forms\Components\FileUpload;
 use Filament\Forms\Components\DateTimePicker;
-use Filament\Forms\Components\RichEditor;
 use Filament\Forms\Components\Section;
 use Filament\Forms\Components\Select;
 use Filament\Forms\Components\Textarea;
@@ -63,10 +62,16 @@ class BlogResource extends Resource
                         Textarea::make('excerpt')
                             ->label('Ringkasan')
                             ->rows(3),
-                        RichEditor::make('content')
-                            ->label('Konten')
+                        Textarea::make('content')
+                            ->label('Konten HTML')
+                            ->helperText('Tulis atau paste kode HTML artikel secara langsung. HTML akan disimpan sebagai source code dan dirender di halaman blog.')
                             ->required()
-                            ->columnSpanFull(),
+                            ->rows(35)
+                            ->columnSpanFull()
+                            ->extraAttributes([
+                                'style' => 'font-family: monospace; font-size: 13px; line-height: 1.6; min-height: 700px;',
+                                'spellcheck' => 'false',
+                            ]),
                     ]),
 
                 Section::make('Media')

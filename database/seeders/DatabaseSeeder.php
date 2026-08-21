@@ -68,9 +68,9 @@ class DatabaseSeeder extends Seeder
         Page::firstOrCreate([
             'slug' => 'tentang',
         ], [
-            'title' => 'Tentang Kami',
-            'content' => '<p>Wacana Style adalah komunitas motor Jawa Tengah yang terbuka untuk semua rider. Kami adalah wadah bagi para pecinta motor untuk berbagi pengalaman, touring bersama, dan mempererat tali persaudaraan.</p>',
-            'excerpt' => 'Tentang Kami Wacana Style',
+            'title' => 'Tentang',
+            'content' => '<p>Wacana Style adalah komunitas motor Jawa Tengah yang terbuka untuk semua rider.</p>',
+            'excerpt' => 'Tentang Wacana Style',
             'status' => 'published',
         ]);
 
@@ -86,21 +86,12 @@ class DatabaseSeeder extends Seeder
         Page::firstOrCreate([
             'slug' => 'peraturan',
         ], [
-            'title' => 'Peraturan Tim',
-            'content' => '<h2>Peraturan Tim</h2><p>Untuk menjaga kenyamanan dan keamanan bersama, setiap anggota Wacana Style diharapkan mematuhi peraturan tim yang telah ditetapkan.</p>',
-            'excerpt' => 'Peraturan Tim Wacana Style',
-            'status' => 'published',
-        ]);
-
-        /* Page::firstOrCreate([
-            'slug' => 'syarat-ketentuan',
-        ], [
             'title' => 'Syarat & Ketentuan',
             'content' => '<h2>Syarat & Ketentuan</h2><p>Dengan mengikuti kegiatan Wacana Style, Anda menyetujui semua peraturan dan ketentuan yang berlaku dalam komunitas kami.</p>',
             'excerpt' => 'Syarat dan ketentuan Wacana Style',
             'status' => 'published',
         ]);
-        */
+
         $form = Form::firstOrCreate([
             'slug' => 'open-po-jaket',
         ], [
@@ -148,6 +139,7 @@ class DatabaseSeeder extends Seeder
                 'status' => 'published',
                 'user_id' => $admin->id,
                 'published_at' => now(),
+                // 'featured_image' => 'blog/sample-image-1.jpg', // Anda perlu menempatkan file ini secara manual di storage/app/public/blog/
             ]);
 
             Blog::create([
@@ -158,6 +150,7 @@ class DatabaseSeeder extends Seeder
                 'status' => 'published',
                 'user_id' => $admin->id,
                 'published_at' => now()->subDays(2),
+                // 'featured_image' => 'blog/sample-image-2.jpg', // Anda perlu menempatkan file ini secara manual di storage/app/public/blog/
             ]);
         }
 
@@ -177,10 +170,10 @@ class DatabaseSeeder extends Seeder
 
         if ($memberRegistrationForm->fields()->count() === 0) {
             $memberFields = [
-                ['label' => 'Nama Lengkap', 'name' => 'riderName', 'type' => 'text', 'is_required' => true, 'sort_order' => 1],
-                ['label' => 'Nomor WhatsApp', 'name' => 'riderContact', 'type' => 'phone', 'is_required' => true, 'sort_order' => 2],
-                ['label' => 'Jenis / Tipe Motor', 'name' => 'scooterModel', 'type' => 'text', 'is_required' => true, 'sort_order' => 3],
-                ['label' => 'Domisili', 'name' => 'riderDomisili', 'type' => 'text', 'is_required' => true, 'sort_order' => 4],
+                ['label' => 'Nama Lengkap', 'name' => 'nama_lengkap', 'type' => 'text', 'is_required' => true, 'sort_order' => 1],
+                ['label' => 'Nomor WhatsApp', 'name' => 'whatsapp', 'type' => 'phone', 'is_required' => true, 'sort_order' => 2],
+                ['label' => 'Jenis / Tipe Motor', 'name' => 'tipe_motor', 'type' => 'text', 'is_required' => true, 'sort_order' => 3],
+                ['label' => 'Domisili', 'name' => 'domisili', 'type' => 'text', 'is_required' => true, 'sort_order' => 4],
             ];
 
             foreach ($memberFields as $field) {

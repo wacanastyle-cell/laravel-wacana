@@ -1,0 +1,366 @@
+<?php
+
+namespace App\Filament\Resources;
+
+use App\Filament\Resources\FormResource\Pages;
+use App\Models\Form as FormModel;
+use Filament\Forms;
+use Filament\Forms\Components\Checkbox;
+use Filament\Forms\Components\DateTimePicker;
+use Filament\Forms\Components\Placeholder;
+use Filament\Forms\Components\Repeater;
+use Filament\Forms\Components\Select;
+use Filament\Forms\Components\Section;
+use Filament\Forms\Components\TextInput;
+use Filament\Forms\Components\Textarea;
+use Filament\Forms\Form;
+use Filament\Resources\Resource;
+use Filament\Tables;
+use Filament\Tables\Columns\TextColumn;
+use Filament\Tables\Filters\SelectFilter;
+use Filament\Tables\Table;
+use Illuminate\Support\HtmlString;
+use Illuminate\Support\Str;
+
+class FormResource extends Resource
+{
+    protected static ?string $model = FormModel::class;
+
+    protected static ?string $navigationIcon = 'heroicon-o-document-text';
+
+    protected static ?string $navigationGroup = 'Data';
+
+    public static function form(Form $form): Form
+    {
+        return $form
+            ->schema([
+
+                /*
+                |--------------------------------------------------------------------------
+                | INFORMASI FORM
+                |--------------------------------------------------------------------------
+                */
+
+                Section::make('Informasi Formulir')
+                    ->description('Tentukan nama, kategori, status, dan jadwal formulir.')
+                    ->icon('heroicon-o-document-text')
+                    ->schema([
+
+                        Forms\Components\Grid::make([
+                            'default' => 1,
+                            'md' => 2,
+                        ])->schema([
+
+                            TextInput::make('title')
+                                ->label('Judul Formulir')
+                                ->placeholder('Contoh: Pendaftaran Touring Dieng 2026')
+                                ->required()
+                                ->maxLength(255)
+                                ->live(onBlur: true)
+                                ->afterStateUpdated(
+                                    fn (Forms\Set $set, ?string $state) =>
+                                    $set('slug', Str::slug($state ?? ''))
+                                )
+                                ->columnSpanFull(),
+
+                            TextInput::make('slug')
+                                ->label('Slug')
+                                ->placeholder('otomatis-dari-judul')
+                                ->maxLength(255)
+                                ->nullable()
+                                ->helperText('Kosongkan jika ingin dibuat otomatis.'),
+
+                            Select::make('category')
+                                ->label('Kategori Formulir')
+                                ->placeholder('Pilih kategori')
+                                ->options([
+                                    'touring' => '🏍️ TOURING',
+                                    'kopdar' => '🤝 KOPDAR',
+                                    'ride_out' => '🏍️ RIDE OUT',
+                                    'jacket_po' => '👕 PEMBUATAN JAKET / OPEN PO',
+                                ])
+                                ->required()
+                                ->live()
+                                ->native(false)
+                                ->afterStateUpdated(function (
+                                    $state,
+                                    Forms\Set $set
+                                ) {
+                                    if (!$state) {
+                                        $set('fields', []);
+                                        return;
+                                    }
+
+                                    $set(
+                                        'fields',
+                                        self::getCategoryFields($state)
+                                    );
+
+                                    $descriptions = [
+                                        'touring' =>
+                                            'Touring antar kota, touring wisata, touring alam',
+
+                                        'kopdar' =>
+                                            'Kopdar rutin, kopdar gabungan, silaturahmi',
+
+                                        'ride_out' =>
+                                            'Sunday Ride, Night Ride, Morning Ride',
+
+                                        'jacket_po' =>
+                                            'Pemesanan dan pembuatan jaket Wacana Style',
+                                    ];
+
+                                    $set(
+                                        'description',
+                                        $descriptions[$state] ?? ''
+                                    );
+                                }),
+
+                            Select::make('status')
+                                ->label('Status')
+                                ->options([
+                                    'draft' => 'Draft',
+                                    'open' => 'Open',
+                                    'closed' => 'Closed',
+                                    'archived' => 'Archived',
+                                ])
+                                ->default('draft')
+                                ->required()
+                                ->native(false),
+
+                        ]),
+
+                        Textarea::make('description')
+                            ->label('Deskripsi')
+                            ->placeholder('Deskripsi singkat formulir...')
+                            ->rows(3)
+                            ->columnSpanFull(),
+
+                        Textarea::make('confirmation_message')
+                            ->label('Pesan Setelah Submit')
+                            ->placeholder('Pesan yang akan ditampilkan setelah formulir berhasil dikirim...')
+                            ->rows(3)
+                            ->columnSpanFull(),
+
+                    ])
+                    ->collapsible(),
+
+                /*
+                |--------------------------------------------------------------------------
+                | JADWAL & NOTIFIKASI
+                |--------------------------------------------------------------------------
+                */
+
+                Section::make('Jadwal & Notifikasi')
+                    ->description('Atur waktu formulir dan pemberitahuan email.')
+                    ->icon('heroicon-o-calendar-days')
+                    ->schema([
+
+                        Forms\Components\Grid::make([
+                            'default' => 1,
+                            'md' => 2,
+                        ])->schema([
+
+                            DateTimePicker::make('starts_at')
+                                ->label('Mulai')
+                                ->native(false),
+
+                            DateTimePicker::make('ends_at')
+                                ->label('Selesai')
+                                ->native(false),
+
+                            Checkbox::make('email_notification_enabled')
+                                ->label('Kirim email konfirmasi ke user'),
+
+                            Checkbox::make('admin_notification_enabled')
+                                ->label('Kirim notifikasi ke admin'),
+
+                        ]),
+
+                    ])
+                    ->collapsible(),
+
+                /*
+                |--------------------------------------------------------------------------
+                | FIELD OTOMATIS
+                |--------------------------------------------------------------------------
+                */
+
+                Section::make('Field Peserta Event')
+                    ->description('Kategori hanya membuat field awal. Anda bebas menambah, menghapus, mengedit, dan mengurutkan field.')
+                    ->icon('heroicon-o-list-bullet')
+                    ->schema([
+
+                        Repeater::make('fields')
+                            ->relationship('fields')
+                            ->label('Kolom Peserta')
+                            ->defaultItems(0)
+                            ->addActionLabel('＋ Tambah Field')
+                            ->reorderable()
+                            ->collapsible()
+                            ->cloneable()
+                            ->itemLabel(
+                                fn (array $state): string =>
+                                    $state['label'] ?? 'Field Baru'
+                            )
+                            ->schema([
+
+                                Forms\Components\Grid::make(2)->schema([
+
+                                    TextInput::make('label')
+                                        ->label('Nama Field')
+                                        ->placeholder('Contoh: Nomor WhatsApp')
+                                        ->required(),
+
+                                    Select::make('type')
+                                        ->label('Jenis Jawaban')
+                                        ->options([
+                                            'text' => 'Teks',
+                                            'textarea' => 'Teks Panjang',
+                                            'email' => 'Email',
+                                            'tel' => 'Nomor Telepon',
+                                            'number' => 'Angka',
+                                            'date' => 'Tanggal',
+                                            'time' => 'Waktu',
+                                            'select' => 'Pilihan',
+                                            'radio' => 'Pilihan Tunggal',
+                                            'checkbox' => 'Pilihan Banyak',
+                                            'file' => 'Upload File',
+                                            'image' => 'Upload Gambar',
+                                        ])
+                                        ->required(),
+
+                                    TextInput::make('name')
+                                        ->label('Nama Sistem')
+                                        ->required()
+                                        ->helperText('Gunakan nama sederhana, contoh: nomor_whatsapp'),
+
+                                    Checkbox::make('is_required')
+                                        ->label('Wajib diisi')
+                                        ->default(false),
+
+                                    TextInput::make('placeholder')
+                                        ->label('Petunjuk')
+                                        ->placeholder('Contoh: 08xxxxxxxxxx')
+                                        ->columnSpanFull(),
+
+                                    Textarea::make('options')
+                                        ->label('Pilihan')
+                                        ->placeholder("Contoh:\nLaki-laki\nPerempuan")
+                                        ->rows(3)
+                                        ->visible(
+                                            fn (Forms\Get $get): bool =>
+                                                in_array(
+                                                    $get('type'),
+                                                    ['select', 'radio', 'checkbox']
+                                                )
+                                        )
+                                        ->columnSpanFull(),
+
+                                    Textarea::make('description')
+                                        ->label('Keterangan')
+                                        ->rows(2)
+                                        ->columnSpanFull(),
+
+                                    TextInput::make('sort_order')
+                                        ->hidden()
+                                        ->default(0),
+
+                                ]),
+
+                            ])
+                            ->columnSpanFull(),
+
+                    ])
+                    ->collapsible(),
+            ]);
+    }
+
+    protected static function getCategoryFields(string $category): array
+    {
+        return FormModel::defaultFields($category);
+    }
+
+    public static function table(Table $table): Table
+    {
+        return $table
+            ->columns([
+
+                TextColumn::make('title')
+                    ->searchable()
+                    ->sortable(),
+
+                TextColumn::make('category')
+                    ->label('Kategori')
+                    ->badge()
+                    ->formatStateUsing(fn (?string $state): string => match ($state) {
+                        'touring' => '🏍️ TOURING',
+                        'kopdar' => '🤝 KOPDAR',
+                        'ride_out' => '🏍️ RIDE OUT',
+                        'jacket_po' => '👕 JAKET / OPEN PO',
+                        default => strtoupper((string) $state),
+                    })
+                    ->sortable(),
+
+                TextColumn::make('slug')
+                    ->searchable(),
+
+                TextColumn::make('status')
+                    ->badge()
+                    ->color(fn (string $state): string => match ($state) {
+                        'open' => 'success',
+                        'draft' => 'gray',
+                        'closed' => 'warning',
+                        'archived' => 'danger',
+                        default => 'primary',
+                    })
+                    ->sortable(),
+
+                TextColumn::make('starts_at')
+                    ->dateTime('d M Y')
+                    ->sortable(),
+
+                TextColumn::make('ends_at')
+                    ->dateTime('d M Y')
+                    ->sortable(),
+
+            ])
+            ->filters([
+
+                SelectFilter::make('status')
+                    ->options([
+                        'draft' => 'Draft',
+                        'open' => 'Open',
+                        'closed' => 'Closed',
+                        'archived' => 'Archived',
+                    ]),
+
+                SelectFilter::make('category')
+                    ->label('Kategori')
+                    ->options([
+                        'touring' => '🏍️ TOURING',
+                        'kopdar' => '🤝 KOPDAR',
+                        'ride_out' => '🏍️ RIDE OUT',
+                        'jacket_po' => '👕 JAKET / OPEN PO',
+                    ]),
+
+            ])
+            ->actions([
+                Tables\Actions\EditAction::make(),
+                Tables\Actions\DeleteAction::make(),
+            ])
+            ->bulkActions([
+                Tables\Actions\BulkActionGroup::make([
+                    Tables\Actions\DeleteBulkAction::make(),
+                ]),
+            ])
+            ->defaultSort('created_at', 'desc');
+    }
+
+    public static function getPages(): array
+    {
+        return [
+            'index' => Pages\ManageForms::route('/'),
+        ];
+    }
+}

@@ -13,6 +13,11 @@ class Form extends Model
     protected $table = 'forms';
 
     protected $fillable = [
+        'thumbnail',
+        'payment_enabled',
+        'payment_amount',
+        'payment_methods',
+        'category',
         'title',
         'slug',
         'description',
@@ -29,6 +34,20 @@ class Form extends Model
         'ends_at' => 'datetime',
         'email_notification_enabled' => 'boolean',
         'admin_notification_enabled' => 'boolean',
+    ];
+
+    public const CATEGORIES = [
+        'touring'   => '🏍️ TOURING',
+        'kopdar'    => '🤝 KOPDAR',
+        'ride_out'  => '🏍️ RIDE OUT',
+        'jacket_po' => '👕 PEMBUATAN JAKET / OPEN PO',
+    ];
+
+    public const CATEGORY_DESCRIPTIONS = [
+        'touring'   => 'Touring antar kota, touring wisata, touring alam',
+        'kopdar'    => 'Kopdar rutin, kopdar gabungan, silaturahmi',
+        'ride_out'  => 'Sunday Ride, Night Ride, Morning Ride',
+        'jacket_po' => 'Pemesanan jaket Wacana Style',
     ];
 
     protected static function booted(): void
@@ -50,19 +69,70 @@ class Form extends Model
         return $this->hasMany(FormSubmission::class);
     }
 
-    public function scopeOpen($query)
+    public static function categoryOptions(): array
     {
-        return $query->where('status', 'open');
+        return self::CATEGORIES;
     }
 
-    public function scopeIsActive($query)
+    public static function defaultFields(?string $category): array
     {
-        return $query->where('status', 'open')
-            ->where(function ($q) {
-                $q->whereNull('starts_at')->orWhere('starts_at', '<=', now());
-            })
-            ->where(function ($q) {
-                $q->whereNull('ends_at')->orWhere('ends_at', '>=', now());
-            });
+        $common = [
+            ['label' => 'Nama Lengkap', 'name' => 'nama_lengkap', 'type' => 'text', 'is_required' => true, 'sort_order' => 1],
+            ['label' => 'Nama Panggilan', 'name' => 'nama_panggilan', 'type' => 'text', 'is_required' => true, 'sort_order' => 2],
+            ['label' => 'Nomor WhatsApp', 'name' => 'nomor_whatsapp', 'type' => 'tel', 'is_required' => true, 'sort_order' => 3],
+            ['label' => 'Asal Kota / Daerah', 'name' => 'asal_kota', 'type' => 'text', 'is_required' => true, 'sort_order' => 4],
+            ['label' => 'Tim / Chapter / Rombongan', 'name' => 'tim_chapter', 'type' => 'text', 'is_required' => false, 'sort_order' => 5],
+            ['label' => 'Nama Komunitas', 'name' => 'nama_komunitas', 'type' => 'text', 'is_required' => true, 'sort_order' => 6],
+            ['label' => 'Jenis Motor', 'name' => 'jenis_motor', 'type' => 'text', 'is_required' => true, 'sort_order' => 7],
+        ];
+
+        $ridingSchedule = [
+            ['label' => 'Tanggal', 'name' => 'tanggal', 'type' => 'date', 'is_required' => true, 'sort_order' => 10],
+            ['label' => 'Waktu', 'name' => 'waktu', 'type' => 'time', 'is_required' => true, 'sort_order' => 11],
+            ['label' => 'Jumlah Peserta', 'name' => 'jumlah_peserta', 'type' => 'number', 'is_required' => true, 'sort_order' => 12],
+            ['label' => 'Membawa Boncengan', 'name' => 'membawa_boncengan', 'type' => 'select', 'options' => '["Ya","Tidak"]', 'is_required' => true, 'sort_order' => 13],
+            ['label' => 'Jumlah Boncengan', 'name' => 'jumlah_boncengan', 'type' => 'number', 'is_required' => true, 'sort_order' => 14],
+            ['label' => 'Catatan / Keterangan', 'name' => 'catatan', 'type' => 'textarea', 'is_required' => true, 'sort_order' => 15],
+        ];
+
+        $kopdarSchedule = [
+            ['label' => 'Tanggal', 'name' => 'tanggal', 'type' => 'date', 'is_required' => true, 'sort_order' => 9],
+            ['label' => 'Waktu', 'name' => 'waktu', 'type' => 'time', 'is_required' => true, 'sort_order' => 10],
+            ['label' => 'Jumlah Peserta', 'name' => 'jumlah_peserta', 'type' => 'number', 'is_required' => true, 'sort_order' => 11],
+            ['label' => 'Membawa Boncengan', 'name' => 'membawa_boncengan', 'type' => 'select', 'options' => '["Ya","Tidak"]', 'is_required' => true, 'sort_order' => 12],
+            ['label' => 'Jumlah Boncengan', 'name' => 'jumlah_boncengan', 'type' => 'number', 'is_required' => true, 'sort_order' => 13],
+            ['label' => 'Catatan / Keterangan', 'name' => 'catatan', 'type' => 'textarea', 'is_required' => true, 'sort_order' => 14],
+        ];
+
+        $presets = [
+            'touring' => array_merge($common, [
+                ['label' => 'Tujuan / Destinasi', 'name' => 'tujuan', 'type' => 'text', 'is_required' => true, 'sort_order' => 8],
+                ['label' => 'Titik Kumpul', 'name' => 'titik_kumpul', 'type' => 'text', 'is_required' => true, 'sort_order' => 9],
+            ], $kopdarSchedule),
+            
+            'kopdar' => array_merge($common, [
+                ['label' => 'Lokasi Kopdar', 'name' => 'lokasi_kopdar', 'type' => 'text', 'is_required' => true, 'sort_order' => 8],
+            ], $kopdarSchedule),
+
+            'ride_out' => array_merge($common, [
+                ['label' => 'Tujuan / Destinasi', 'name' => 'tujuan', 'type' => 'text', 'is_required' => true, 'sort_order' => 8],
+                ['label' => 'Titik Kumpul', 'name' => 'titik_kumpul', 'type' => 'text', 'is_required' => true, 'sort_order' => 9],
+            ], $kopdarSchedule),
+
+            'jacket_po' => array_merge($common, [
+                ['label' => 'Ukuran Jaket', 'name' => 'ukuran_jaket', 'type' => 'select', 'options' => '["S","M","L","XL","XXL","XXXL"]', 'is_required' => true, 'sort_order' => 8],
+                ['label' => 'Jumlah Jaket', 'name' => 'jumlah_jaket', 'type' => 'number', 'placeholder' => 'Min 1', 'is_required' => true, 'sort_order' => 9,
+                'validation_rules' => ['min' => 1],
+            ],
+                ['label' => 'Nama untuk Dicetak', 'name' => 'nama_cetak', 'type' => 'text', 'is_required' => true, 'sort_order' => 10],
+                ['label' => 'Nomor / ID untuk Dicetak', 'name' => 'id_cetak', 'type' => 'text', 'is_required' => true, 'sort_order' => 11],
+                ['label' => 'Catatan / Permintaan Khusus', 'name' => 'catatan_khusus', 'type' => 'textarea', 'is_required' => true, 'sort_order' => 12],
+                ['label' => 'Metode Pembayaran', 'name' => 'metode_pembayaran', 'type' => 'select', 'options' => '["Transfer Bank","E-Wallet","Cash","Lainnya"]', 'is_required' => true, 'sort_order' => 13],
+                ['label' => 'Bukti Pembayaran', 'name' => 'bukti_pembayaran', 'type' => 'file', 'is_required' => true, 'sort_order' => 14],
+                ['label' => 'Persetujuan Ketentuan Jaket', 'name' => 'persetujuan', 'type' => 'checkbox', 'description' => 'Saya telah membaca, memahami, dan menyetujui seluruh ketentuan pembelian serta pemakaian jaket Wacana Style. Saya bersedia menjaga nama baik, reputasi, dan kehormatan Wacana Style serta menjaga sikap, etika, dan tata krama dalam menggunakan atribut Wacana Style. Saya memahami bahwa jaket merupakan atribut yang membawa nama Wacana Style dan bersedia tidak melakukan tindakan yang dapat merugikan atau mencemarkan nama baik Wacana Style.', 'is_required' => true, 'sort_order' => 15],
+            ]),
+        ];
+
+        return $presets[$category] ?? [];
     }
 }

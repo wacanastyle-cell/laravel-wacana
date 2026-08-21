@@ -65,7 +65,7 @@ class NavigationComposer
                 'route' => 'public.blogs',
             ],
             [
-                'label' => 'FORMULIR',
+                'label' => 'EVENT',
                 'type' => 'link',
                 'route' => 'public.forms',
             ],

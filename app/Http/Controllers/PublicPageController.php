@@ -16,7 +16,7 @@ class PublicPageController extends Controller
     {
         $latestBlogs = Blog::query()
             ->where('status', 'published')
-            ->recent()
+            ->latest('published_at')
             ->limit(3)
             ->get();
 
@@ -111,7 +111,7 @@ class PublicPageController extends Controller
     {
         $blogs = Blog::query()
             ->where('status', 'published')
-            ->recent()
+            ->latest('published_at')
             ->paginate(9);
 
         return view('public.blog.index', compact('blogs'));
@@ -127,7 +127,7 @@ class PublicPageController extends Controller
         $relatedBlogs = Blog::query()
             ->where('status', 'published')
             ->where('id', '!=', $blog->id)
-            ->recent()
+            ->latest('published_at')
             ->limit(3)
             ->get();
 

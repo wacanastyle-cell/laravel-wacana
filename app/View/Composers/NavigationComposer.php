@@ -29,7 +29,7 @@ class NavigationComposer
                 'type' => 'link',
             ],
             [
-                'title' => 'Formulir',
+                'title' => 'EVENT',
                 'url' => route('public.forms'),
                 'type' => 'link',
             ],

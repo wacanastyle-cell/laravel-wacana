@@ -64,15 +64,13 @@ class FormController extends Controller
             }
 
             if ($field->type === 'checkbox') {
-                $value = $request->input($fieldName, []);
+                // Untuk checkbox tunggal (persetujuan), nilainya adalah "1"
+                // Untuk checkbox multi, nilainya adalah array
+                $value = $request->input($fieldName);
             }
 
             if ($field->type === 'select' && is_array($value)) {
                 $value = implode(', ', $value);
-            }
-
-            if ($field->type === 'radio') {
-                $value = (string) $value;
             }
 
             if ($field->type === 'number') {
@@ -82,17 +80,16 @@ class FormController extends Controller
             $submissionData[$fieldName] = $value;
         }
 
-        $submitterName = $request->input('submitter_name')
-            ?? $request->input('riderName') // Menggunakan nama field dari HTML form
+        $submitterName = $request->input('nama_lengkap')
+            ?? $request->input('submitter_name')
             ?? $request->input('name')
-            ?? $request->input('full_name')
             ?? 'Pengisi Form';
 
         $submitterEmail = $request->input('submitter_email')
             ?? $request->input('email');
 
-        $submitterPhone = $request->input('submitter_phone')
-            ?? $request->input('riderContact') // Menggunakan nama field dari HTML form
+        $submitterPhone = $request->input('nomor_whatsapp')
+            ?? $request->input('submitter_phone')
             ?? $request->input('phone');
 
         $submission = FormSubmission::create([
@@ -125,7 +122,14 @@ class FormController extends Controller
         $rules = [];
 
         if ($field->is_required) {
-            $rules[] = 'required';
+            // Checkbox tunggal (persetujuan) menggunakan 'accepted'
+            if ($field->type === 'checkbox' && empty($field->optionsList())) {
+                $rules[] = 'accepted';
+            } else {
+                $rules[] = 'required';
+            }
+        } else {
+            $rules[] = 'nullable';
         }
 
         $fieldRules = is_array($field->validation_rules) ? $field->validation_rules : json_decode($field->validation_rules ?? '[]', true);
@@ -135,16 +139,17 @@ class FormController extends Controller
 
         $typeRules = match ($field->type) {
             'email' => ['email'],
-            'phone' => ['string', 'max:50'],
+            'phone', 'tel' => ['string', 'max:50'],
             'number' => ['numeric'],
             'date' => ['date'],
+            'time' => ['string'],
             'select', 'radio' => ['string'],
-            'checkbox' => ['array'],
+            'checkbox' => !empty($field->optionsList()) ? ['array'] : [],
             'file' => ['file', 'mimes:jpg,jpeg,png,webp,pdf,doc,docx', 'max:2048'],
             'image' => ['image', 'mimes:jpg,jpeg,png,webp', 'max:2048'],
             default => ['string'],
         };
 
-        return array_values(array_filter(array_merge($rules, $typeRules, $field->is_required ? ['sometimes'] : ['nullable'])));
+        return array_values(array_unique(array_merge($rules, $typeRules)));
     }
 }

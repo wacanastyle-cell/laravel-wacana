@@ -43,7 +43,7 @@
     </div>
 
     @if($blog->featured_image)
-        <img src="{{ Storage::disk('public')->url($blog->featured_image) }}" alt="{{ $blog->title }}" class="w-full rounded-2xl mb-8">
+        <img src="{{ url('/storage/' . ltrim($blog->featured_image, '/')) }}" alt="{{ $blog->title }}" class="w-full rounded-2xl mb-8">
     @endif
 
     <h1 class="text-5xl font-bold mb-4">{{ $blog->title }}</h1>
@@ -83,7 +83,7 @@
                 @foreach($relatedBlogs as $relatedBlog)
                     <a href="{{ route('public.blog.show', $relatedBlog->slug) }}" class="bg-slate-900 rounded-xl overflow-hidden border border-slate-800 hover:border-red-500 transition group">
                         @if($relatedBlog->featured_image)
-                            <img src="{{ Storage::disk('public')->url($relatedBlog->featured_image) }}" alt="{{ $relatedBlog->title }}" class="h-40 w-full object-cover group-hover:scale-105 transition">
+                            <img src="{{ url('/storage/' . ltrim($relatedBlog->featured_image, '/')) }}" alt="{{ $relatedBlog->title }}" class="h-40 w-full object-cover group-hover:scale-105 transition">
                         @endif
                         <div class="p-4">
                             <h4 class="font-semibold">{{ $relatedBlog->title }}</h4>

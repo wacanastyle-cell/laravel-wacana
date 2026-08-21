@@ -217,7 +217,7 @@
 
                 <a href="{{ route('public.galleries') }}">Galeri</a>
 
-                <a href="{{ route('public.form.show', 'open-po-jaket') }}">Formulir</a>
+                <a href="{{ route('public.form.show', 'open-po-jaket') }}">EVENT</a>
 
                 <a href="{{ route('public.blogs') }}">Blog</a>
 

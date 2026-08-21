@@ -115,8 +115,9 @@
             position:absolute;
             inset:0;
             overflow:hidden;
-            z-index:-3;
+            z-index:0;
             pointer-events:none;
+            background:#050507;
         }
         .video-background-container::before{
             content:"";
@@ -126,30 +127,33 @@
                 radial-gradient(circle at 70% 40%,rgba(239,0,0,.12),transparent 35%),
                 linear-gradient(90deg,rgba(0,0,0,.92) 0%,rgba(0,0,0,.58) 46%,rgba(0,0,0,.55) 100%),
                 linear-gradient(0deg,rgba(0,0,0,.8),transparent 50%,rgba(0,0,0,.45));
-            z-index:2;
+            z-index:1;
         }
         .video-background-container::after{
             content:"";
             position:absolute;
             inset:0;
             background:rgba(0,0,0,.15);
-            z-index:3;
+            z-index:2;
         }
         .video-foreground{
             position:absolute;
-            top:50%;
-            left:50%;
-            width:100vw;
-            height:56.25vw;
+            inset:0;
+            width:100%;
+            height:100%;
             min-width:100%;
             min-height:100%;
+            display:block;
             border:0;
             pointer-events:none;
-            z-index:1;
-            transform:translate(-50%,-50%) scale(1.22);
+            z-index:0;
+            object-fit:cover;
+            object-position:center center;
+            background:#050507;
         }
         .hero-fallback{
             position:absolute;
+            transition:opacity .35s ease;
             inset:0;
             background:
                 radial-gradient(circle at 75% 50%,rgba(220,38,38,.22),transparent 28%),
@@ -157,6 +161,8 @@
             z-index:-1;
         }
         .hero-content{
+            position:relative;
+            z-index:5;
             width:min(var(--container),calc(100% - 32px));
             margin:auto;
             padding:130px 0 90px;
@@ -373,6 +379,8 @@
             inset:20px;
             border:1px solid rgba(255,255,255,.08);
             border-radius:18px;
+            z-index:1;
+            pointer-events:none;
         }
         .about-card .big-logo{
             position:absolute;
@@ -385,6 +393,18 @@
             color:rgba(255,255,255,.035);
             letter-spacing:-.08em;
         }
+        .about-card .big-logo img{
+            position:relative;
+            z-index:2;
+            display:block;
+            width:min(78%,430px);
+            max-width:78%;
+            max-height:300px;
+            height:auto;
+            object-fit:contain;
+            opacity:1;
+            filter:drop-shadow(0 20px 35px rgba(0,0,0,.45));
+        }
         .about-card-info{
             position:absolute;
             left:30px;right:30px;bottom:30px;
@@ -393,6 +413,7 @@
             background:rgba(0,0,0,.42);
             backdrop-filter:blur(12px);
             border-radius:16px;
+            z-index:3;
         }
         .about-card-info strong{font-family:Montserrat;font-size:22px}
         .about-card-info span{display:block;color:#a1a1aa;font-size:12px;margin-top:5px}
@@ -904,9 +925,10 @@
             .footer-grid{grid-template-columns:1fr}
             .hero-actions .btn{width:100%}
             .video-foreground{
-                width:177.78vh;
-                height:100vh;
-                transform:translate(-50%,-50%) scale(2.7);
+                width:100%;
+                height:100%;
+                transform:none;
+                object-fit:cover;
             }
         }
     </style>
@@ -933,7 +955,7 @@
                 Ganti file berikut dengan video kamu:
                 public/video/hero.mp4
             -->
-            <video class="video-foreground" autoplay muted loop playsinline preload="metadata" poster="{{ asset('images/hero.jpg') }}">
+            <video class="video-foreground" autoplay muted loop playsinline preload="auto" poster="{{ asset('images/foto-1.jpg') }}" aria-hidden="true">
                 <source src="{{ asset('video/hero.mp4') }}" type="video/mp4">
             </video>
         </div>
@@ -1030,7 +1052,7 @@
 
                 <div class="about-card reveal">
                    <div class="big-logo">
-    <img src="{{ asset('storage/app/public/foto/foto-2.jpg') }}" alt="Wacana Style">
+    <img src="{{ asset('images/foto-2.jpg') }}" alt="Wacana Style">
                </div>
                     <div class="about-card-info">
                         <strong>WACANA STYLE</strong>
@@ -1117,69 +1139,75 @@
 
             <div class="gallery-grid reveal">
                 <div class="g-item g-item--featured" onclick="openLightbox(0)">
-                    <img src="https://blogger.googleusercontent.com/img/b/R29vZ2xl/AVvXsEh2lVXBIRFpnepIrcMvric4e_DAvBbSss0iOFQiwuAv4iawm9dMP6SN6RZHxiZWVuVJWrrz4otSrtSDXp8O0gazwZ6XtszP1417fXtbBrCgnHkFHk71oXvSJjYGRi0IG3LzDCQG6pkOiOHYMoUv9Wjv46gGX_hvvcwpsrNa0VUGDcOTXbo/s1600/image1786103074=crop" alt="Kopdar Mingguan" loading="lazy">
+                    <img src="{{ asset('images/foto-1.jpg') }}" alt="Touring Dieng" loading="lazy">
                     <div class="g-zoom"><i class="fa-solid fa-expand"></i></div>
-                    <div class="g-overlay"><span class="g-tag">Kopdar</span><span class="g-caption">Kopdar Mingguan</span></div>
+                    <div class="g-overlay"><span class="g-tag">Touring</span><span class="g-caption">Touring Dieng</span></div>
                 </div>
 
                 <div class="g-item" onclick="openLightbox(1)">
-                    <img src="https://blogger.googleusercontent.com/img/b/R29vZ2xl/AVvXsEinbzdfqsg0FucluXyQUNgOiygGwSJx-e-Ix0a6iujH_zqizSTHpkHSm0_o01BrT4ypGeKl3Wk8X14ISwh8TkUSCBPWTwiOUQbAREhyphenhyphenxMMgUEyWEN4TFL4gElw4_S-P9hYwLgLp7dnmfzn28wXHlkR-fwaSeCzh3-_5JAfqQpn9P-6A6YM/s1600/image1786102771=crop" alt="Touring Senja" loading="lazy">
+                    <img src="{{ asset('images/foto-2.jpg') }}" alt="Touring Senja" loading="lazy">
                     <div class="g-zoom"><i class="fa-solid fa-expand"></i></div>
                     <div class="g-overlay"><span class="g-tag">Touring</span><span class="g-caption">Touring Senja</span></div>
                 </div>
 
                 <div class="g-item" onclick="openLightbox(2)">
-                    <img src="https://blogger.googleusercontent.com/img/b/R29vZ2xl/AVvXsEgMNO1ZjX3vTD9AG3PZ1H_H83m66BvOTyli9J4UKf9kRUAEqBsw7Bhqxkr7AehLgkiJqnt1uTOUaBnm1Xa_niLZtUyFZG9wBG0agxgGsDMW1Sn03_plIvrMpje87qNdQDkihbMahJA4s8VMTzm-MMn0OldCjxvVK8FY3tKoL9BYoVF78xw/s1600/image1786103071" alt="Ngopi Bareng" loading="lazy">
+                    <img src="{{ asset('images/foto-3.jpg') }}" alt="Ngopi Bareng" loading="lazy">
                     <div class="g-zoom"><i class="fa-solid fa-expand"></i></div>
-                    <div class="g-overlay"><span class="g-tag">Kopdar</span><span class="g-caption">Ngopi Bareng</span></div>
+                    <div class="g-overlay"><span class="g-tag">Roling</span><span class="g-caption">Ngopi Bareng</span></div>
                 </div>
 
                 <div class="g-item g-item--wide" onclick="openLightbox(3)">
-                    <img src="https://blogger.googleusercontent.com/img/b/R29vZ2xl/AVvXsEj2IqLOyKfk8Fxm_JD_QEwAorq29xax7odSp0JiunSIblTjdk4eMspIxQ5uaReevJN2_bC_Lzbw_5rwu6jrdIDRSygqrq0SO_4QWb4ZYoShfOrBiis8lUx77BvrjjLKHOQPqpvpUMklOR0JXOnIu08542rSEpJTDMa5p98aWbBQ01dWVgw/s1600/image1786105389=crop" alt="Barisan Motor" loading="lazy">
+                    <img src="{{ asset('images/foto-4.jpg') }}" alt="Barisan Motor" loading="lazy">
                     <div class="g-zoom"><i class="fa-solid fa-expand"></i></div>
                     <div class="g-overlay"><span class="g-tag">Ride</span><span class="g-caption">Barisan Motor</span></div>
                 </div>
 
                 <div class="g-item" onclick="openLightbox(4)">
-                    <img src="https://blogger.googleusercontent.com/img/b/R29vZ2xl/AVvXsEinmsgINggCiCgfjYJAp3ECH0DcpqwIo3IzWCJHHTO_yBZAaqb8NBC62Hy1j6pYpCdCEuvSfqloQMyViU8MNVe5hyphenhyphen3iQ4SQ1BaoDRJdVL-Qzk4PE1DrnOfS5bvOK16PyHBBtnzcLlGYWY14-nxHoaj-7LM2Om6InHKXd3zJyt6yo-awu8s/s1600/image1786105411=crop" alt="Aspal Malam" loading="lazy">
+                    <img src="{{ asset('images/foto-5.jpg') }}" alt="Warung Bude" loading="lazy">
                     <div class="g-zoom"><i class="fa-solid fa-expand"></i></div>
-                    <div class="g-overlay"><span class="g-tag">Night Ride</span><span class="g-caption">Aspal Malam</span></div>
+                    <div class="g-overlay"><span class="g-tag">Kopdar</span><span class="g-caption">Kopdar Minguan</span></div>
                 </div>
 
                 <div class="g-item" onclick="openLightbox(5)">
-                    <img src="https://blogger.googleusercontent.com/img/b/R29vZ2xl/AVvXsEiCv13nD1ay5yuICwht-DrNW3DZ47CcrfdjNYyYoAvNKXWatUKMLv1dlPXPhVaGTleTxJxMbLliw50zq8gn0eo7abdJx0_WhO3CTbaoa16mk1LREab1WJmB_Z_92s4O-m2N0toGm-R8ZVNtRuShuOdS5Rw4LsX-r3PsmZS7hhMFzmYggUg/s1600/image1786105409=crop" alt="Touring Pantura" loading="lazy">
+                    <img src="{{ asset('images/foto-6.jpg') }}" alt="Ngopi Bude CW" loading="lazy">
                     <div class="g-zoom"><i class="fa-solid fa-expand"></i></div>
-                    <div class="g-overlay"><span class="g-tag">Touring</span><span class="g-caption">Touring Pantura</span></div>
+                    <div class="g-overlay"><span class="g-tag">Kopdar</span><span class="g-caption">Ngopi Bude CW</span></div>
                 </div>
 
                 <div class="g-item" onclick="openLightbox(6)">
-                    <img src="https://blogger.googleusercontent.com/img/b/R29vZ2xl/AVvXsEjCHmIW4mPcEalklo3qm1MmXwpUl1N6zyTOXNYjELr9h16mxpLtEskgaCqOj2H2d7IsWyyE_WgQP65ZFgrFT7gECm2WiMT1V7aLlxv72iQ9VIbEuYNXbaJ0GeJRWjCpwejLZjKGKP_SVsckvi3C8DjAlliKfwxI2vBuJLev4WtqXJQmwHU/s1600/image1786103074=crop" alt="Warung Kopi" loading="lazy">
+                    <img src="{{ asset('images/foto-7.jpg') }}" alt="Night ride" loading="lazy">
                     <div class="g-zoom"><i class="fa-solid fa-expand"></i></div>
-                    <div class="g-overlay"><span class="g-tag">Kopdar</span><span class="g-caption">Warung Kopi</span></div>
+                    <div class="g-overlay"><span class="g-tag">Night ride </span><span class="g-caption">Night ride</span></div>
                 </div>
 
                 <div class="g-item" onclick="openLightbox(7)">
-                    <img src="https://blogger.googleusercontent.com/img/b/R29vZ2xl/AVvXsEji6pp-0nJelTd00GdX6MDki-uNt1WtjtcLLWLITqIdu_2sLuLiBEI8S-xKho_sLIGugg7k0KstxAGsxYEzupK_mrhVXa1Cf1-JNii0e6EpTuMRDQH_TyRJlqbw-zfoNVVGVGMGLadVYA0uqckoYRSzZXroypXSGRLLORTMONbCDTK0m4Y/s1600/image1786105392=crop" alt="Camping Bareng" loading="lazy">
+                    <img src="{{ asset('images/foto-8.jpg') }}" alt="Night ride V1" loading="lazy">
                     <div class="g-zoom"><i class="fa-solid fa-expand"></i></div>
-                    <div class="g-overlay"><span class="g-tag">Event</span><span class="g-caption">Camping Bareng</span></div>
+                    <div class="g-overlay"><span class="g-tag">Event</span><span class="g-caption">Night ride V1</span></div>
                 </div>
 
                 <div class="g-item" onclick="openLightbox(8)">
-                    <img src="https://blogger.googleusercontent.com/img/b/R29vZ2xl/AVvXsEj6DqqhnOgMJB6GypGdqNUp2w055NiPlMutOuzPbI32cd_yubn6OyJaV9Cf6lpuxPCfP4Px-nn86JpZLBYJ0zj5yY9DBjiw9i1wlgwtIgPUBndBMSspvwLK7-kbnBW7BTYuotp-mfdm0_1ktfkxfEXUHG0pSEbKzbhH8669vauyc2bDmkc/s1600/image1786105407=crop" alt="Detail Motor" loading="lazy">
+                    <img src="{{ asset('images/foto-9.jpg') }}" alt="Agenda Bulanan" loading="lazy">
                     <div class="g-zoom"><i class="fa-solid fa-expand"></i></div>
-                    <div class="g-overlay"><span class="g-tag">Motor</span><span class="g-caption">Detail Motor</span></div>
+                    <div class="g-overlay"><span class="g-tag">Night ride</span><span class="g-caption">Agenda Bulanan</span></div>
+                </div>
+
+                <div class="g-item" onclick="openLightbox(9)">
+                    <img src="{{ asset('images/foto-10.jpg') }}" alt="Satu Aspal" loading="lazy">
+                    <div class="g-zoom"><i class="fa-solid fa-expand"></i></div>
+                    <div class="g-overlay"><span class="g-tag">Moment</span><span class="g-caption">Satu Aspal</span></div>
                 </div>
 
                 <div class="g-item" onclick="openLightbox(10)">
-                    <img src="https://blogger.googleusercontent.com/img/b/R29vZ2xl/AVvXsEj3P-WCppyLit3Sh-J9s-SOGmbm7yJxPvjMN25zI8TzQPLh9ZMc5vm0ZG4Duwxcfw1-NyIx79UmctR6_2bxWnsMGE7EIF3qbjeBPQeBiunA2p02CMGzDWPq4VrhEHXlvC3WuKR5W_RiW3UyMZhGol9mP7AlK8QYtDGwk9rwVVfCQJPUOCA/s1600/image1786105414=crop" alt="Kopdar Sore" loading="lazy">
+                    <img src="{{ asset('images/foto-11.jpg') }}" alt="Kopdar Malam CW" loading="lazy">
                     <div class="g-zoom"><i class="fa-solid fa-expand"></i></div>
-                    <div class="g-overlay"><span class="g-tag">Kopdar</span><span class="g-caption">Kopdar Sore</span></div>
+                    <div class="g-overlay"><span class="g-tag">Kopdar</span><span class="g-caption">Kopdar Malam</span></div>
                 </div>
 
                 <div class="g-item" onclick="openLightbox(11)">
-                    <img src="https://blogger.googleusercontent.com/img/b/R29vZ2xl/AVvXsEhCmtZX1kpy8iv04bipb9wEncvXwTIO51T1NQeBqRyw7RfsZ-2Dv6EMaVKQvg6evMYPt2yi1FWYWsQqMtCZAKdGxigElQm9K4BDHBPGZOZo8FWZZCNaM27e2BkxLuOmQ4hqlWjkwiToSfu2Sll_TPDE2e6NkZF3TJJ1XLcxeIuUT6zozZA/s1600/image1786105404" alt="Sampai Jumpa" loading="lazy">
+                    <img src="{{ asset('images/foto-12.jpg') }}" alt="Touring To Dieng" loading="lazy">
                     <div class="g-zoom"><i class="fa-solid fa-expand"></i></div>
-                    <div class="g-overlay"><span class="g-tag">Moment</span><span class="g-caption">Sampai Jumpa</span></div>
+                    <div class="g-overlay"><span class="g-tag">Moment</span><span class="g-caption">Touring Dieng</span></div>
                 </div>
             </div>
         </div>
@@ -1365,18 +1393,18 @@
        DATA GALLERY
        ========================================================== */
     const galleryPhotos = [
-        {src:"https://blogger.googleusercontent.com/img/b/R29vZ2xl/AVvXsEh2lVXBIRFpnepIrcMvric4e_DAvBbSss0iOFQiwuAv4iawm9dMP6SN6RZHxiZWVuVJWrrz4otSrtSDXp8O0gazwZ6XtszP1417fXtbBrCgnHkFHk71oXvSJjYGRi0IG3LzDCQG6pkOiOHYMoUv9Wjv46gGX_hvvcwpsrNa0VUGDcOTXbo/s1600/image1786103074=crop",caption:"Kopdar Mingguan"},
-        {src:"https://blogger.googleusercontent.com/img/b/R29vZ2xl/AVvXsEinbzdfqsg0FucluXyQUNgOiygGwSJx-e-Ix0a6iujH_zqizSTHpkHSm0_o01BrT4ypGeKl3Wk8X14ISwh8TkUSCBPWTwiOUQbAREhyphenhyphenxMMgUEyWEN4TFL4gElw4_S-P9hYwLgLp7dnmfzn28wXHlkR-fwaSeCzh3-_5JAfqQpn9P-6A6YM/s1600/image1786102771=crop",caption:"Touring Senja"},
-        {src:"https://blogger.googleusercontent.com/img/b/R29vZ2xl/AVvXsEgMNO1ZjX3vTD9AG3PZ1H_H83m66BvOTyli9J4UKf9kRUAEqBsw7Bhqxkr7AehLgkiJqnt1uTOUaBnm1Xa_niLZtUyFZG9wBG0agxgGsDMW1Sn03_plIvrMpje87qNdQDkihbMahJA4s8VMTzm-MMn0OldCjxvVK8FY3tKoL9BYoVF78xw/s1600/image1786103071",caption:"Ngopi Bareng"},
-        {src:"https://blogger.googleusercontent.com/img/b/R29vZ2xl/AVvXsEj2IqLOyKfk8Fxm_JD_QEwAorq29xax7odSp0JiunSIblTjdk4eMspIxQ5uaReevJN2_bC_Lzbw_5rwu6jrdIDRSygqrq0SO_4QWb4ZYoShfOrBiis8lUx77BvrjjLKHOQPqpvpUMklOR0JXOnIu08542rSEpJTDMa5p98aWbBQ01dWVgw/s1600/image1786105389=crop",caption:"Barisan Motor"},
-        {src:"https://blogger.googleusercontent.com/img/b/R29vZ2xl/AVvXsEinmsgINggCiCgfjYJAp3ECH0DcpqwIo3IzWCJHHTO_yBZAaqb8NBC62Hy1j6pYpCdCEuvSfqloQMyViU8MNVe5hyphenhyphen3iQ4SQ1BaoDRJdVL-Qzk4PE1DrnOfS5bvOK16PyHBBtnzcLlGYWY14-nxHoaj-7LM2Om6InHKXd3zJyt6yo-awu8s/s1600/image1786105411=crop",caption:"Aspal Malam"},
-        {src:"https://blogger.googleusercontent.com/img/b/R29vZ2xl/AVvXsEiCv13nD1ay5yuICwht-DrNW3DZ47CcrfdjNYyYoAvNKXWatUKMLv1dlPXPhVaGTleTxJxMbLliw50zq8gn0eo7abdJx0_WhO3CTbaoa16mk1LREab1WJmB_Z_92s4O-m2N0toGm-R8ZVNtRuShuOdS5Rw4LsX-r3PsmZS7hhMFzmYggUg/s1600/image1786105409=crop",caption:"Touring Pantura"},
-        {src:"https://blogger.googleusercontent.com/img/b/R29vZ2xl/AVvXsEjCHmIW4mPcEalklo3qm1MmXwpUl1N6zyTOXNYjELr9h16mxpLtEskgaCqOj2H2d7IsWyyE_WgQP65ZFgrFT7gECm2WiMT1V7aLlxv72iQ9VIbEuYNXbaJ0GeJRWjCpwejLZjKGKP_SVsckvi3C8DjAlliKfwxI2vBuJLev4WtqXJQmwHU/s1600/image1786103074=crop",caption:"Warung Kopi"},
-        {src:"https://blogger.googleusercontent.com/img/b/R29vZ2xl/AVvXsEji6pp-0nJelTd00GdX6MDki-uNt1WtjtcLLWLITqIdu_2sLuLiBEI8S-xKho_sLIGugg7k0KstxAGsxYEzupK_mrhVXa1Cf1-JNii0e6EpTuMRDQH_TyRJlqbw-zfoNVVGVGMGLadVYA0uqckoYRSzZXroypXSGRLLORTMONbCDTK0m4Y/s1600/image1786105392=crop",caption:"Camping Bareng"},
-        {src:"https://blogger.googleusercontent.com/img/b/R29vZ2xl/AVvXsEj6DqqhnOgMJB6GypGdqNUp2w055NiPlMutOuzPbI32cd_yubn6OyJaV9Cf6lpuxPCfP4Px-nn86JpZLBYJ0zj5yY9DBjiw9i1wlgwtIgPUBndBMSspvwLK7-kbnBW7BTYuotp-mfdm0_1ktfkxfEXUHG0pSEbKzbhH8669vauyc2bDmkc/s1600/image1786105407=crop",caption:"Detail Motor"},
-        {src:"https://blogger.googleusercontent.com/img/b/R29vZ2xl/AVvXsEjOmb_3Xc0zC75nlzZpfvLPHQgIunsGzwnsgP5fFKeoNknIs38P6PLUIx2ZN6O0PXjANvzMiHKQG-r1EQ2u-sVnwyoSXE9omhSSv9ycEpK1oLPeUKlsKCoMop35A429xAW1qPSD-IyyDWtKM-qyVvRCIXbEbvCYq0nu3m2Mn_2u9J6mQk/s1600/image1786105932=crop",caption:"Satu Aspal"},
-        {src:"https://blogger.googleusercontent.com/img/b/R29vZ2xl/AVvXsEj3P-WCppyLit3Sh-J9s-SOGmbm7yJxPvjMN25zI8TzQPLh9ZMc5vm0ZG4Duwxcfw1-NyIx79UmctR6_2bxWnsMGE7EIF3qbjeBPQeBiunA2p02CMGzDWPq4VrhEHXlvC3WuKR5W_RiW3UyMZhGol9mP7AlK8QYtDGwk9rwVVfCQJPUOCA/s1600/image1786105414=crop",caption:"Kopdar Sore"},
-        {src:"https://blogger.googleusercontent.com/img/b/R29vZ2xl/AVvXsEhCmtZX1kpy8iv04bipb9wEncvXwTIO51T1NQeBqRyw7RfsZ-2Dv6EMaVKQvg6evMYPt2yi1FWYWsQqMtCZAKdGxigElQm9K4BDHBPGZOZo8FWZZCNaM27e2BkxLuOmQ4hqlWjkwiToSfu2Sll_TPDE2e6NkZF3TJJ1XLcxeIuUT6zozZA/s1600/image1786105404",caption:"Sampai Jumpa"}
+        {src:"{{ asset('images/foto-1.jpg') }}",caption:"Touring Dieng"},
+        {src:"{{ asset('images/foto-2.jpg') }}",caption:"Touring Senja"},
+        {src:"{{ asset('images/foto-3.jpg') }}",caption:"Ngopi Bareng"},
+        {src:"{{ asset('images/foto-4.jpg') }}",caption:"Barisan Motor"},
+        {src:"{{ asset('images/foto-5.jpg') }}",caption:"Warung Bude"},
+        {src:"{{ asset('images/foto-6.jpg') }}",caption:"Ngopi Bude CW"},
+        {src:"{{ asset('images/foto-7.jpg') }}",caption:"Night ride"},
+        {src:"{{ asset('images/foto-8.jpg') }}",caption:"Night ride V1"},
+        {src:"{{ asset('images/foto-9.jpg') }}",caption:"Agenda Bulanan"},
+        {src:"{{ asset('images/foto-10.jpg') }}",caption:"Satu Aspal"},
+        {src:"{{ asset('images/foto-11.jpg') }}",caption:"Kopdar Malam CW"},
+        {src:"{{ asset('images/foto-12.jpg') }}",caption:"Touring To Dieng"}
     ];
 
     let lbIndex = 0;
@@ -1592,13 +1620,22 @@
     }
 
     function updateJacketPrice(){
+        const priceDisplay = document.getElementById('priceDisplay');
+        const modalUnitPrice = document.getElementById('modalUnitPrice');
+        const modalQty = document.getElementById('modalQty');
+        const modalTotal = document.getElementById('modalTotal');
+
+        if(!priceDisplay && !modalUnitPrice && !modalQty && !modalTotal){
+            return;
+        }
+
         const unit = BASE_PRICE + selectedExtra;
         const total = unit * jacketQty;
 
-        document.getElementById('priceDisplay').textContent = rupiah(unit);
-        document.getElementById('modalUnitPrice').textContent = rupiah(unit);
-        document.getElementById('modalQty').textContent = jacketQty + ' pcs';
-        document.getElementById('modalTotal').textContent = rupiah(total);
+        if(priceDisplay) priceDisplay.textContent = rupiah(unit);
+        if(modalUnitPrice) modalUnitPrice.textContent = rupiah(unit);
+        if(modalQty) modalQty.textContent = jacketQty + ' pcs';
+        if(modalTotal) modalTotal.textContent = rupiah(total);
     }
 
     /* ==========================================================
@@ -1631,10 +1668,6 @@
         if(e.target === this) closeLightbox();
     });
 
-    document.getElementById('jacketModal').addEventListener('click',function(e){
-        if(e.target === this) closeJacketModal();
-    });
-
     document.getElementById('statusModal').addEventListener('click',function(e){
         if(e.target === this) closeStatusModal();
     });
@@ -1642,9 +1675,7 @@
     document.addEventListener('keydown',function(e){
         if(e.key === 'Escape'){
             closeLightbox();
-            closeJacketModal();
             closeStatusModal();
-            toggleDrawer(false);
         }
 
         const lb = document.getElementById('lightbox');
@@ -1659,10 +1690,23 @@
        ========================================================== */
     const heroVideo = document.querySelector('.video-foreground');
     if(heroVideo){
-        heroVideo.addEventListener('error',function(){
-            document.querySelector('.hero-fallback').style.zIndex = '0';
-            document.querySelector('.video-background-container').style.display = 'none';
+        const videoContainer = document.querySelector('.video-background-container');
+        const fallback = document.querySelector('.hero-fallback');
+
+        heroVideo.addEventListener('loadeddata',function(){
+            if(fallback) fallback.style.opacity = '0';
         });
+
+        heroVideo.addEventListener('canplay',function(){
+            heroVideo.play().catch(function(){});
+        });
+
+        heroVideo.addEventListener('error',function(){
+            if(fallback) fallback.style.opacity = '1';
+            if(videoContainer) videoContainer.style.display = 'none';
+        });
+
+        heroVideo.play().catch(function(){});
     }
 
     updateJacketPrice();
