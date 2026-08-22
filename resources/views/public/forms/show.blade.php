@@ -1,684 +1,1609 @@
 @php
-    $siteName = $siteSettings['site_name'] ?? 'Wacana Style';
+    use Illuminate\Support\Facades\Storage;
+
+    $siteName =
+        $siteSettings['site_name']
+        ?? 'Wacana Style';
+
+    $categoryNames = [
+        'touring' => 'Touring',
+        'kopdar' => 'Kopdar',
+        'ride_out' => 'Ride Out',
+        'jacket_po' => 'Pembuatan Jaket / Open PO',
+    ];
+
+    $categoryName =
+        $categoryNames[$form->category]
+        ?? ucfirst(
+            str_replace(
+                '_',
+                ' ',
+                $form->category
+            )
+        );
+
+    $effectivePrice =
+        (float) (
+            $form->promo_price > 0
+                ? $form->promo_price
+                : $form->payment_amount
+        );
+
+    $success =
+        session('form_success');
+
+    $variations =
+        is_array($form->price_variations)
+            ? $form->price_variations
+            : [];
+
+    $priceFields =
+        $form->fields
+            ->where('is_price_field', true)
+            ->values();
 @endphp
 
 <!DOCTYPE html>
+
 <html lang="id">
+
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
-    <title>{{ $form->title }} | {{ $siteName }}</title>
+<meta charset="UTF-8">
 
-    <meta name="description"
-          content="{{ \Illuminate\Support\Str::limit(strip_tags($form->description ?? 'Formulir Wacana Style'), 160) }}">
+<meta name="viewport"
+      content="width=device-width, initial-scale=1.0">
 
-    <link rel="preconnect" href="https://fonts.googleapis.com">
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<title>
+    {{ $form->title }} | {{ $siteName }}
+</title>
 
-    <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;500;600;700;800;900&family=Inter:wght@400;500;600;700;800&display=swap"
-          rel="stylesheet">
+<meta
+    name="description"
+    content="{{ $form->description ?: 'Formulir '.$categoryName.' '.$siteName }}"
+>
 
-    <link rel="stylesheet"
-          href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.7.2/css/all.min.css">
+<link rel="preconnect"
+      href="https://fonts.googleapis.com">
 
-    <style>
-        /* =========================
-           PUBLIC FORM THUMBNAIL
-        ========================= */
+<link rel="preconnect"
+      href="https://fonts.gstatic.com"
+      crossorigin>
 
-        .public-form-thumbnail {
-            width: 100%;
-            max-width: 1100px;
-            margin: 0 auto 28px;
-            aspect-ratio: 16 / 9;
-            overflow: hidden;
-            border-radius: 22px;
-            border: 1px solid rgba(255,255,255,.10);
-            background: #111114;
-            box-shadow: 0 20px 60px rgba(0,0,0,.35);
-        }
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=Montserrat:wght@500;600;700;800;900&display=swap"
+      rel="stylesheet">
 
-        .public-form-thumbnail img {
-            display: block;
-            width: 100%;
-            height: 100%;
-            object-fit: cover;
-        }
+<link rel="stylesheet"
+      href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.7.2/css/all.min.css">
 
-        @media (max-width: 640px) {
-            .public-form-thumbnail {
-                border-radius: 16px;
-                margin-bottom: 20px;
-            }
-        }
+<style>
 
-        * {
-            box-sizing: border-box;
-        }
+:root{
+    --red:#ef2029;
+    --bg:#060608;
+    --card:#0d0d10;
+    --card2:#111116;
+    --border:rgba(255,255,255,.09);
+    --text:#f5f5f5;
+    --muted:#96969f;
+}
 
-        html {
-            scroll-behavior: smooth;
-        }
+*{
+    box-sizing:border-box;
+}
 
-        body {
-            width: 100%;
-            min-height: 100vh;
-            margin: 0;
-            padding: 0;
-            overflow-x: hidden;
-            background: #08080a;
-            color: #f4f4f5;
-            font-family: Inter, Arial, sans-serif;
-        }
+body{
+    margin:0;
 
-        h1,
-        h2,
-        h3,
-        h4 {
-            font-family: Montserrat, Arial, sans-serif;
-        }
+    background:
+        radial-gradient(
+            circle at 50% -8%,
+            rgba(239,32,41,.15),
+            transparent 35%
+        ),
+        var(--bg);
 
-        a {
-            color: inherit;
-            text-decoration: none;
-        }
+    color:var(--text);
 
-        button,
-        input,
-        select,
-        textarea {
-            font: inherit;
-        }
+    font-family:Inter,Arial,sans-serif;
+}
 
-        ::-webkit-scrollbar {
-            width: 6px;
-        }
+a{
+    color:inherit;
+    text-decoration:none;
+}
 
-        ::-webkit-scrollbar-track {
-            background: #0d0d0f;
-        }
+.form-container{
+    width:min(950px,calc(100% - 32px));
+    margin:auto;
 
-        ::-webkit-scrollbar-thumb {
-            background: #dc2626;
-            border-radius: 10px;
-        }
+    padding:90px 0 110px;
+}
 
-        .form-page {
-            width: 100%;
-            min-height: 100vh;
-            padding: 110px 16px 70px;
-        }
+.form-back{
+    display:inline-flex;
+    align-items:center;
+    gap:8px;
 
-        .form-container {
-            width: min(900px, 100%);
-            margin: 0 auto;
-        }
+    margin-bottom:25px;
 
-        .form-card {
-            overflow: hidden;
-            background:
-                linear-gradient(
-                    145deg,
-                    rgba(25, 25, 29, .98),
-                    rgba(12, 12, 15, .98)
-                );
-            border: 1px solid rgba(255,255,255,.08);
-            border-radius: 22px;
-            box-shadow:
-                0 25px 70px rgba(0,0,0,.45),
-                0 0 0 1px rgba(255,255,255,.02);
-        }
+    color:#ff4b52;
 
-        .form-header {
-            padding: 34px 34px 28px;
-            border-bottom: 1px solid rgba(255,255,255,.07);
-        }
+    font-size:12px;
+    font-weight:700;
+}
 
-        .brand-label {
-            display: inline-flex;
-            align-items: center;
-            gap: 8px;
-            margin-bottom: 12px;
-            color: #ef4444;
-            font-family: Montserrat, Arial, sans-serif;
-            font-size: 11px;
-            font-weight: 800;
-            letter-spacing: .18em;
-            text-transform: uppercase;
-        }
+.form-card{
+    overflow:hidden;
 
-        .brand-dot {
-            width: 7px;
-            height: 7px;
-            border-radius: 50%;
-            background: #ef2029;
-            box-shadow: 0 0 12px rgba(239,32,41,.65);
-        }
+    border:1px solid var(--border);
+    border-radius:22px;
 
-        .form-title {
-            margin: 0;
-            color: #fff;
-            font-size: clamp(25px, 4vw, 38px);
-            line-height: 1.15;
-            font-weight: 800;
-        }
+    background:rgba(255,255,255,.018);
+}
 
-        .form-description {
-            margin: 14px 0 0;
-            color: #a1a1aa;
-            font-size: 14px;
-            line-height: 1.75;
-        }
+.form-banner{
+    width:100%;
+    max-height:480px;
 
-        .form-body {
-            padding: 32px 34px 36px;
-        }
+    display:block;
 
-        .alert {
-            margin-bottom: 24px;
-            padding: 14px 16px;
-            border-radius: 12px;
-            font-size: 13px;
-            line-height: 1.6;
-        }
+    object-fit:cover;
+}
 
-        .alert-success {
-            color: #bbf7d0;
-            background: rgba(34,197,94,.08);
-            border: 1px solid rgba(34,197,94,.25);
-        }
+.form-head{
+    padding:36px 40px 28px;
+}
 
-        .alert-error {
-            color: #fecaca;
-            background: rgba(239,68,68,.08);
-            border: 1px solid rgba(239,68,68,.25);
-        }
+.form-category{
+    display:inline-flex;
 
-        .alert-error ul {
-            margin: 0;
-            padding-left: 20px;
-        }
+    padding:7px 12px;
 
-        .field {
-            margin-bottom: 22px;
-        }
+    margin-bottom:15px;
 
-        .field-label {
-            display: block;
-            margin-bottom: 8px;
-            color: #e4e4e7;
-            font-family: Montserrat, Arial, sans-serif;
-            font-size: 12px;
-            font-weight: 700;
-            letter-spacing: .03em;
-        }
+    border:1px solid rgba(239,32,41,.25);
+    border-radius:100px;
 
-        .required {
-            color: #ef4444;
-            margin-left: 3px;
-        }
+    background:rgba(239,32,41,.08);
 
-        .field-input,
-        .field-select,
-        .field-textarea {
-            display: block;
-            width: 100%;
-            border: 1px solid rgba(255,255,255,.10);
-            border-radius: 12px;
-            outline: none;
-            background: #09090b;
-            color: #f4f4f5;
-            padding: 13px 14px;
-            transition:
-                border-color .2s ease,
-                box-shadow .2s ease,
-                background .2s ease;
-        }
+    color:#ff4b52;
 
-        .field-input::placeholder,
-        .field-textarea::placeholder {
-            color: #52525b;
-        }
+    font-size:10px;
+    font-weight:800;
 
-        .field-input:focus,
-        .field-select:focus,
-        .field-textarea:focus {
-            border-color: #ef4444;
-            background: #0c0c0f;
-            box-shadow: 0 0 0 3px rgba(239,68,68,.10);
-        }
+    text-transform:uppercase;
+}
 
-        .field-textarea {
-            min-height: 120px;
-            resize: vertical;
-            line-height: 1.6;
-        }
+.form-title{
+    margin:0;
 
-        .field-select {
-            cursor: pointer;
-        }
+    font-family:Montserrat,Arial,sans-serif;
 
-        .field-select option {
-            background: #09090b;
-            color: #fff;
-        }
+    font-size:clamp(34px,5vw,56px);
 
-        .field-help {
-            margin: 7px 0 0;
-            color: #71717a;
-            font-size: 11px;
-            line-height: 1.6;
-        }
+    line-height:1.08;
 
-        .checkbox-group {
-            display: flex;
-            flex-direction: column;
-            gap: 10px;
-        }
+    font-weight:900;
 
-        .checkbox-item {
-            display: flex;
-            align-items: flex-start;
-            gap: 10px;
-            color: #d4d4d8;
-            font-size: 13px;
-            line-height: 1.5;
-            cursor: pointer;
-        }
+    letter-spacing:-2px;
+}
 
-        .checkbox-item input {
-            width: 17px;
-            height: 17px;
-            margin: 2px 0 0;
-            accent-color: #ef2029;
-            flex: 0 0 auto;
-        }
+.form-description{
+    margin:18px 0 0;
 
-        .file-input {
-            display: block;
-            width: 100%;
-            padding: 10px;
-            border: 1px dashed rgba(255,255,255,.16);
-            border-radius: 12px;
-            background: #09090b;
-            color: #a1a1aa;
-            cursor: pointer;
-        }
+    color:var(--muted);
 
-        .file-input:hover {
-            border-color: rgba(239,68,68,.55);
-        }
+    font-size:14px;
+    line-height:1.8;
+}
 
-        .file-input::file-selector-button {
-            margin-right: 12px;
-            padding: 9px 14px;
-            border: 0;
-            border-radius: 9px;
-            background: #ef2029;
-            color: #fff;
-            font-weight: 700;
-            cursor: pointer;
-        }
+.event-info{
+    display:grid;
 
-        .submit-area {
-            margin-top: 30px;
-            padding-top: 25px;
-            border-top: 1px solid rgba(255,255,255,.07);
-        }
+    grid-template-columns:
+        repeat(2,minmax(0,1fr));
 
-        .submit-button {
-            display: inline-flex;
-            align-items: center;
-            justify-content: center;
-            gap: 9px;
-            min-height: 48px;
-            padding: 0 22px;
-            border: 0;
-            border-radius: 12px;
-            background: #dc2626;
-            color: #fff;
-            font-family: Montserrat, Arial, sans-serif;
-            font-size: 13px;
-            font-weight: 800;
-            cursor: pointer;
-            transition:
-                background .2s ease,
-                transform .2s ease,
-                box-shadow .2s ease;
-        }
+    gap:12px;
 
-        .submit-button:hover {
-            background: #ef2029;
-            transform: translateY(-1px);
-            box-shadow: 0 10px 30px rgba(220,38,38,.25);
-        }
+    margin-top:24px;
+}
 
-        .submit-button:active {
-            transform: translateY(0);
-        }
+.info-card{
+    padding:14px 15px;
 
-        .upload-note {
-            margin-top: 8px;
-            color: #71717a;
-            font-size: 10px;
-            line-height: 1.5;
-        }
+    border:1px solid var(--border);
+    border-radius:12px;
 
-        @media (max-width: 700px) {
-            .form-page {
-                padding: 90px 12px 50px;
-            }
+    background:rgba(255,255,255,.02);
+}
 
-            .form-header {
-                padding: 25px 20px 22px;
-            }
+.info-card small{
+    display:block;
 
-            .form-body {
-                padding: 24px 20px 28px;
-            }
+    margin-bottom:5px;
 
-            .form-card {
-                border-radius: 16px;
-            }
+    color:#6f6f78;
 
-            .submit-button {
-                width: 100%;
-            }
-        }
-    </style>
+    font-size:9px;
+    font-weight:800;
+
+    text-transform:uppercase;
+}
+
+.info-card strong{
+    font-size:12px;
+}
+
+.form-body{
+    padding:32px 40px 42px;
+
+    border-top:1px solid var(--border);
+}
+
+.fields-grid{
+    display:grid;
+
+    grid-template-columns:
+        repeat(12,minmax(0,1fr));
+
+    gap:18px;
+}
+
+.field-wrap{
+    grid-column:span 12;
+}
+
+.field-wrap[data-width="half"]{
+    grid-column:span 6;
+}
+
+.field-wrap[data-width="third"]{
+    grid-column:span 4;
+}
+
+.field-label{
+    display:block;
+
+    margin-bottom:8px;
+
+    color:#eee;
+
+    font-size:12px;
+    font-weight:700;
+}
+
+.required{
+    color:#ff4b52;
+}
+
+.field-help{
+    margin-top:7px;
+
+    color:#71717a;
+
+    font-size:10px;
+    line-height:1.5;
+}
+
+.field-input,
+.field-select,
+.field-textarea{
+    width:100%;
+
+    padding:13px 14px;
+
+    border:1px solid rgba(255,255,255,.11);
+    border-radius:11px;
+
+    outline:none;
+
+    background:#101014;
+
+    color:#fff;
+
+    font-family:inherit;
+
+    font-size:13px;
+}
+
+.field-textarea{
+    min-height:120px;
+
+    resize:vertical;
+}
+
+.field-input:focus,
+.field-select:focus,
+.field-textarea:focus{
+    border-color:rgba(239,32,41,.7);
+
+    box-shadow:
+        0 0 0 3px rgba(239,32,41,.08);
+}
+
+.choice-list{
+    display:grid;
+
+    gap:9px;
+}
+
+.choice{
+    display:flex;
+
+    align-items:center;
+
+    gap:9px;
+
+    padding:11px 12px;
+
+    border:1px solid var(--border);
+    border-radius:10px;
+
+    background:#101014;
+
+    font-size:12px;
+}
+
+.field-heading{
+    padding-top:14px;
+
+    border-top:1px solid var(--border);
+}
+
+.field-heading h3{
+    margin:0;
+
+    font-family:Montserrat;
+
+    font-size:18px;
+}
+
+.field-info{
+    padding:14px 16px;
+
+    border:1px solid rgba(239,32,41,.16);
+    border-radius:11px;
+
+    background:rgba(239,32,41,.05);
+
+    color:#b9b9c0;
+
+    font-size:12px;
+    line-height:1.7;
+}
+
+.payment-box{
+    margin-top:30px;
+
+    padding:22px;
+
+    border:1px solid rgba(239,32,41,.18);
+    border-radius:16px;
+
+    background:rgba(239,32,41,.04);
+}
+
+.payment-title{
+    margin:0 0 17px;
+
+    font-family:Montserrat;
+
+    font-size:17px;
+}
+
+.price{
+    font-family:Montserrat;
+
+    font-size:28px;
+    font-weight:900;
+
+    color:#fff;
+}
+
+.old-price{
+    margin-left:8px;
+
+    color:#777780;
+
+    text-decoration:line-through;
+
+    font-size:12px;
+}
+
+.payment-grid{
+    display:grid;
+
+    grid-template-columns:
+        repeat(2,minmax(0,1fr));
+
+    gap:12px;
+
+    margin-top:18px;
+}
+
+.payment-item{
+    padding:13px;
+
+    border:1px solid var(--border);
+    border-radius:10px;
+
+    background:rgba(255,255,255,.02);
+
+    font-size:11px;
+}
+
+.qris{
+    display:block;
+
+    max-width:260px;
+
+    margin:20px auto 0;
+
+    border-radius:14px;
+}
+
+.submit-btn{
+    width:100%;
+
+    margin-top:28px;
+
+    padding:15px 20px;
+
+    border:0;
+    border-radius:12px;
+
+    cursor:pointer;
+
+    background:
+        linear-gradient(
+            135deg,
+            #ef2029,
+            #b91c1c
+        );
+
+    color:#fff;
+
+    font-family:Montserrat;
+
+    font-size:13px;
+    font-weight:900;
+}
+
+.error-box,
+.success-box{
+    margin-bottom:22px;
+
+    padding:16px;
+
+    border-radius:12px;
+
+    font-size:12px;
+    line-height:1.7;
+}
+
+.error-box{
+    border:1px solid rgba(239,68,68,.25);
+
+    background:rgba(239,68,68,.07);
+
+    color:#fca5a5;
+}
+
+.success-box{
+    border:1px solid rgba(34,197,94,.25);
+
+    background:rgba(34,197,94,.07);
+
+    color:#bbf7d0;
+}
+
+.quota-full{
+    margin-top:25px;
+
+    padding:18px;
+
+    text-align:center;
+
+    border:1px solid rgba(239,68,68,.25);
+    border-radius:12px;
+
+    background:rgba(239,68,68,.06);
+
+    color:#fca5a5;
+
+    font-size:12px;
+}
+
+.conditional-hidden{
+    display:none !important;
+}
+
+@media(max-width:680px){
+
+    .form-container{
+        width:calc(100% - 28px);
+
+        padding:55px 0 75px;
+    }
+
+    .form-head,
+    .form-body{
+        padding:25px 22px;
+    }
+
+    .field-wrap[data-width="half"],
+    .field-wrap[data-width="third"]{
+        grid-column:span 12;
+    }
+
+    .event-info,
+    .payment-grid{
+        grid-template-columns:1fr;
+    }
+
+    .form-title{
+        font-size:35px;
+    }
+}
+
+</style>
+
 </head>
+
 
 <body>
 
 @include('partials.header-nav')
 
-<main class="form-page">
-@if(!empty($form->thumbnail))
-    <div class="public-form-thumbnail">
-        <img
-            src="{{ asset('storage/' . ltrim($form->thumbnail, '/')) }}"
-            alt="{{ $form->title }}"
-            loading="eager"
-            onerror="this.parentElement.style.display='none';"
-        >
+<main>
+
+<div class="form-container">
+
+
+<a
+    href="{{ route('public.forms') }}"
+    class="form-back"
+>
+    <i class="fa-solid fa-arrow-left"></i>
+
+    Semua Formulir
+</a>
+
+
+@if($success)
+
+<div class="success-box">
+
+    <strong>
+        {{ $success['success_title'] ?? 'Berhasil' }}
+    </strong>
+
+    <div>
+        {{ $success['success_message'] ?? '' }}
     </div>
+
+    @if(!empty($success['next_instructions']))
+        <div style="margin-top:8px">
+            {{ $success['next_instructions'] }}
+        </div>
+    @endif
+
+    @if(!empty($success['reference_number']))
+        <div style="margin-top:8px">
+            Nomor:
+            <strong>
+                {{ $success['reference_number'] }}
+            </strong>
+        </div>
+    @endif
+
+</div>
+
 @endif
 
-    <div class="form-container">
 
-        <section class="form-card">
+@if($errors->any())
 
-            <header class="form-header">
-                <div class="brand-label">
-                    <span class="brand-dot"></span>
-                    {{ $siteName }}
+<div class="error-box">
+
+    <strong>
+        Periksa kembali formulir:
+    </strong>
+
+    <ul>
+
+        @foreach($errors->all() as $error)
+
+            <li>{{ $error }}</li>
+
+        @endforeach
+
+    </ul>
+
+</div>
+
+@endif
+
+
+<section class="form-card">
+
+
+@if(
+    $form->show_banner &&
+    $form->banner
+)
+
+<img
+    src="{{ Storage::disk('public')->url($form->banner) }}"
+    alt="{{ $form->title }}"
+    class="form-banner"
+>
+
+@endif
+
+
+<header class="form-head">
+
+    <div class="form-category">
+        {{ $categoryName }}
+    </div>
+
+
+    @if($form->show_title)
+
+        <h1 class="form-title">
+            {{ $form->title }}
+        </h1>
+
+    @endif
+
+
+    @if(
+        $form->show_description &&
+        $form->description
+    )
+
+        <div class="form-description">
+            {{ $form->description }}
+        </div>
+
+    @endif
+
+
+    @if(
+        ($form->show_date && $form->event_date) ||
+        ($form->show_time && $form->event_time) ||
+        ($form->show_location && $form->location) ||
+        ($form->show_quota && $form->quota) ||
+        ($form->show_remaining_quota && $remainingQuota !== null) ||
+        $form->show_registration_count
+    )
+
+    <div class="event-info">
+
+
+        @if(
+            $form->show_date &&
+            $form->event_date
+        )
+
+        <div class="info-card">
+
+            <small>Tanggal Event</small>
+
+            <strong>
+                {{ $form->event_date->format('d M Y') }}
+            </strong>
+
+        </div>
+
+        @endif
+
+
+        @if(
+            $form->show_time &&
+            $form->event_time
+        )
+
+        <div class="info-card">
+
+            <small>Jam Event</small>
+
+            <strong>
+                {{ substr($form->event_time,0,5) }}
+            </strong>
+
+        </div>
+
+        @endif
+
+
+        @if(
+            $form->show_location &&
+            $form->location
+        )
+
+        <div class="info-card">
+
+            <small>Lokasi</small>
+
+            <strong>
+                {{ $form->location }}
+            </strong>
+
+            @if($form->google_maps_url)
+                <div style="margin-top:5px">
+                    <a
+                        href="{{ $form->google_maps_url }}"
+                        target="_blank"
+                        style="color:#ff4b52"
+                    >
+                        Buka Google Maps
+                    </a>
                 </div>
+            @endif
 
-                <h1 class="form-title">
-                    {{ $form->title }}
-                </h1>
+        </div>
 
-                @if($form->description)
-                    <p class="form-description">
-                        {{ $form->description }}
-                    </p>
-                @endif
-            </header>
+        @endif
 
-            <div class="form-body">
 
-                @if(session('success'))
-                    <div class="alert alert-success">
-                        <i class="fa-solid fa-circle-check"></i>
-                        {{ session('success') }}
-                    </div>
-                @endif
+        @if(
+            $form->show_quota &&
+            $form->quota
+        )
 
-                @if($errors->any())
-                    <div class="alert alert-error">
-                        <ul>
-                            @foreach($errors->all() as $error)
-                                <li>{{ $error }}</li>
-                            @endforeach
-                        </ul>
-                    </div>
-                @endif
+        <div class="info-card">
 
-                <form
-                    method="POST"
-                    action="{{ route('public.form.store', $form->slug) }}"
-                    enctype="multipart/form-data"
-                >
-                    @csrf
+            <small>Kuota</small>
 
-                    @foreach($form->fields as $field)
+            <strong>
+                {{ $form->quota }} peserta
+            </strong>
 
-                        @php
-                            $fieldName = $field->name;
-                            $oldValue = old($fieldName);
-                        @endphp
+        </div>
 
-                        <div class="field">
+        @endif
 
-                            <label class="field-label" for="{{ $fieldName }}">
-                                {{ $field->label }}
 
-                                @if($field->is_required)
-                                    <span class="required">*</span>
-                                @endif
-                            </label>
+        @if(
+            $form->show_remaining_quota &&
+            $remainingQuota !== null
+        )
 
-                            @switch($field->type)
+        <div class="info-card">
 
-                                @case('textarea')
-                                    <textarea
-                                        id="{{ $fieldName }}"
-                                        name="{{ $fieldName }}"
-                                        rows="5"
-                                        class="field-textarea"
-                                        placeholder="{{ $field->placeholder ?? '' }}"
-                                        {{ $field->is_required ? 'required' : '' }}
-                                    >{{ old($fieldName) }}</textarea>
-                                    @break
+            <small>Sisa Kuota</small>
 
-                                @case('tel')
-                                @case('phone')
-                                    <input
-                                        id="{{ $fieldName }}"
-                                        type="tel"
-                                        name="{{ $fieldName }}"
-                                        value="{{ old($fieldName) }}"
-                                        class="field-input"
-                                        placeholder="{{ $field->placeholder ?? '' }}"
-                                        autocomplete="tel"
-                                        {{ $field->is_required ? 'required' : '' }}
-                                    >
-                                    @break
+            <strong>
+                {{ $remainingQuota }}
+            </strong>
 
-                                @case('number')
-                                    <input
-                                        id="{{ $fieldName }}"
-                                        type="number"
-                                        name="{{ $fieldName }}"
-                                        value="{{ old($fieldName) }}"
-                                        class="field-input"
-                                        placeholder="{{ $field->placeholder ?? '' }}"
-                                        {{ $field->is_required ? 'required' : '' }}
-                                    >
-                                    @break
+        </div>
 
-                                @case('date')
-                                    <input
-                                        id="{{ $fieldName }}"
-                                        type="date"
-                                        name="{{ $fieldName }}"
-                                        value="{{ old($fieldName) }}"
-                                        class="field-input"
-                                        {{ $field->is_required ? 'required' : '' }}
-                                    >
-                                    @break
+        @endif
 
-                                @case('time')
-                                    <input
-                                        id="{{ $fieldName }}"
-                                        type="time"
-                                        name="{{ $fieldName }}"
-                                        value="{{ old($fieldName) }}"
-                                        class="field-input"
-                                        {{ $field->is_required ? 'required' : '' }}
-                                    >
-                                    @break
 
-                                @case('select')
-                                    @php
-                                        $options = $field->optionsList();
-                                    @endphp
+        @if($form->show_registration_count)
 
-                                    <select
-                                        id="{{ $fieldName }}"
-                                        name="{{ $fieldName }}"
-                                        class="field-select"
-                                        {{ $field->is_required ? 'required' : '' }}
-                                    >
-                                        <option value="">Pilih</option>
+        <div class="info-card">
 
-                                        @foreach($options as $option)
-                                            <option
-                                                value="{{ $option }}"
-                                                {{ (string) $oldValue === (string) $option ? 'selected' : '' }}
-                                            >
-                                                {{ $option }}
-                                            </option>
-                                        @endforeach
-                                    </select>
-                                    @break
+            <small>Jumlah Pendaftar</small>
 
-                                @case('checkbox')
-                                    @php
-                                        $options = $field->optionsList();
-                                        $isSingleCheckbox = $field->isSingleCheckbox();
-                                    @endphp
+            <strong>
+                {{ $registrationCount }}
+            </strong>
 
-                                    @if($isSingleCheckbox)
+        </div>
 
-                                        <label class="checkbox-item">
-                                            <input
-                                                type="checkbox"
-                                                id="{{ $fieldName }}"
-                                                name="{{ $fieldName }}"
-                                                value="1"
-                                                {{ old($fieldName) ? 'checked' : '' }}
-                                                {{ $field->is_required ? 'required' : '' }}
-                                            >
+        @endif
 
-                                            <span>
-                                                {{ $field->description ?: $field->label }}
-                                            </span>
-                                        </label>
-
-                                    @else
-
-                                        <div class="checkbox-group">
-                                            @foreach($options as $option)
-                                                <label class="checkbox-item">
-                                                    <input
-                                                        type="checkbox"
-                                                        name="{{ $fieldName }}[]"
-                                                        value="{{ $option }}"
-                                                        {{ is_array(old($fieldName)) && in_array($option, old($fieldName)) ? 'checked' : '' }}
-                                                    >
-
-                                                    <span>{{ $option }}</span>
-                                                </label>
-                                            @endforeach
-                                        </div>
-
-                                    @endif
-                                    @break
-
-                                @case('file')
-                                    <input
-                                        id="{{ $fieldName }}"
-                                        type="file"
-                                        name="{{ $fieldName }}"
-                                        class="file-input"
-                                        accept=".jpg,.jpeg,.png,.webp,.pdf,.doc,.docx"
-                                        {{ $field->is_required ? 'required' : '' }}
-                                    >
-
-                                    <div class="upload-note">
-                                        Maksimal 10 MB. Format: JPG, JPEG, PNG, WEBP, PDF, DOC, DOCX.
-                                    </div>
-                                    @break
-
-                                @case('image')
-                                    <input
-                                        id="{{ $fieldName }}"
-                                        type="file"
-                                        name="{{ $fieldName }}"
-                                        class="file-input"
-                                        accept="image/jpeg,image/png,image/webp"
-                                        {{ $field->is_required ? 'required' : '' }}
-                                    >
-
-                                    <div class="upload-note">
-                                        Maksimal 10 MB. Format: JPG, JPEG, PNG, WEBP.
-                                    </div>
-                                    @break
-
-                                @case('email')
-                                    <input
-                                        id="{{ $fieldName }}"
-                                        type="email"
-                                        name="{{ $fieldName }}"
-                                        value="{{ old($fieldName) }}"
-                                        class="field-input"
-                                        placeholder="{{ $field->placeholder ?? '' }}"
-                                        autocomplete="email"
-                                        {{ $field->is_required ? 'required' : '' }}
-                                    >
-                                    @break
-
-                                @default
-                                    <input
-                                        id="{{ $fieldName }}"
-                                        type="text"
-                                        name="{{ $fieldName }}"
-                                        value="{{ old($fieldName) }}"
-                                        class="field-input"
-                                        placeholder="{{ $field->placeholder ?? '' }}"
-                                        {{ $field->is_required ? 'required' : '' }}
-                                    >
-
-                            @endswitch
-
-                            @if($field->description && !($field->type === 'checkbox' && $field->isSingleCheckbox()))
-                                <p class="field-help">
-                                    {{ $field->description }}
-                                </p>
-                            @endif
-
-                        </div>
-
-                    @endforeach
-
-                    <div class="submit-area">
-                        <button type="submit" class="submit-button">
-                            <i class="fa-solid fa-paper-plane"></i>
-                            <span>Kirim Formulir</span>
-                        </button>
-                    </div>
-
-                </form>
-
-            </div>
-        </section>
 
     </div>
+
+    @endif
+
+</header>
+
+
+<div class="form-body">
+
+
+@if(
+    $remainingQuota !== null &&
+    $remainingQuota <= 0
+)
+
+<div class="quota-full">
+
+    Kuota pendaftaran sudah penuh.
+
+</div>
+
+@else
+
+
+<form
+    method="POST"
+    action="{{ route('public.form.store', $form->slug) }}"
+    enctype="multipart/form-data"
+    id="dynamicForm"
+>
+
+@csrf
+
+
+<div class="fields-grid">
+
+
+@foreach($form->fields as $field)
+
+@php
+
+    $options = $field->optionsList();
+
+    $oldValue =
+        old(
+            $field->name,
+            $field->default_value
+        );
+
+@endphp
+
+
+@if($field->type === 'heading')
+
+<div
+    class="field-wrap field-heading"
+    data-width="full"
+>
+
+    <h3>
+        {{ $field->label }}
+    </h3>
+
+    @if($field->description)
+
+        <div class="field-help">
+            {{ $field->description }}
+        </div>
+
+    @endif
+
+</div>
+
+
+@elseif($field->type === 'info')
+
+<div
+    class="field-wrap field-info"
+    data-width="full"
+>
+
+    <strong>
+        {{ $field->label }}
+    </strong>
+
+    @if($field->description)
+
+        <div style="margin-top:5px">
+            {{ $field->description }}
+        </div>
+
+    @endif
+
+</div>
+
+
+@else
+
+<div
+    class="field-wrap"
+    data-field-name="{{ $field->name }}"
+    data-width="{{ $field->width ?: 'full' }}"
+    data-conditional="{{ $field->conditional_enabled ? '1' : '0' }}"
+    data-conditional-field="{{ $field->conditional_field }}"
+    data-conditional-operator="{{ $field->conditional_operator }}"
+    data-conditional-value="{{ $field->conditional_value }}"
+>
+
+
+<label class="field-label">
+
+    {{ $field->label }}
+
+    @if($field->is_required)
+        <span class="required">*</span>
+    @endif
+
+</label>
+
+
+@if($field->type === 'textarea')
+
+<textarea
+    name="{{ $field->name }}"
+    class="field-textarea"
+    placeholder="{{ $field->placeholder }}"
+    {{ $field->is_required ? 'required' : '' }}
+>{{ $oldValue }}</textarea>
+
+
+@elseif($field->type === 'select')
+
+<select
+    name="{{ $field->name }}"
+    class="field-select"
+    {{ $field->is_required ? 'required' : '' }}
+>
+
+<option value="">
+    -- Pilih --
+</option>
+
+@foreach($options as $option)
+
+<option
+    value="{{ $option }}"
+    @selected((string)$oldValue === (string)$option)
+>
+    {{ $option }}
+</option>
+
+@endforeach
+
+</select>
+
+
+@elseif($field->type === 'radio')
+
+<div class="choice-list">
+
+@foreach($options as $option)
+
+<label class="choice">
+
+<input
+    type="radio"
+    name="{{ $field->name }}"
+    value="{{ $option }}"
+    @checked((string)$oldValue === (string)$option)
+    {{ $field->is_required ? 'required' : '' }}
+>
+
+{{ $option }}
+
+</label>
+
+@endforeach
+
+</div>
+
+
+@elseif($field->type === 'checkbox' && count($options))
+
+<div class="choice-list">
+
+@foreach($options as $option)
+
+<label class="choice">
+
+<input
+    type="checkbox"
+    name="{{ $field->name }}[]"
+    value="{{ $option }}"
+    @checked(
+        is_array(old($field->name)) &&
+        in_array($option, old($field->name))
+    )
+>
+
+{{ $option }}
+
+</label>
+
+@endforeach
+
+</div>
+
+
+@elseif($field->type === 'checkbox')
+
+<label class="choice">
+
+<input
+    type="checkbox"
+    name="{{ $field->name }}"
+    value="1"
+    @checked(old($field->name))
+    {{ $field->is_required ? 'required' : '' }}
+>
+
+{{ $field->description ?: 'Ya' }}
+
+</label>
+
+
+@elseif($field->type === 'toggle')
+
+<label class="choice">
+
+<input
+    type="checkbox"
+    name="{{ $field->name }}"
+    value="1"
+    @checked($oldValue)
+>
+
+Aktif
+
+</label>
+
+
+@elseif(
+    in_array(
+        $field->type,
+        ['file','image']
+    )
+)
+
+<input
+    type="file"
+    name="{{ $field->name }}"
+    class="field-input"
+    @if($field->type === 'image')
+        accept="image/*"
+    @endif
+    {{ $field->is_required ? 'required' : '' }}
+>
+
+
+@else
+
+<input
+    type="{{
+        match($field->type) {
+            'email' => 'email',
+            'tel','phone' => 'tel',
+            'number' => 'number',
+            'date' => 'date',
+            'time' => 'time',
+            'url' => 'url',
+            default => 'text'
+        }
+    }}"
+    name="{{ $field->name }}"
+    value="{{ $oldValue }}"
+    class="field-input"
+    placeholder="{{ $field->placeholder }}"
+
+    @if($field->min_length)
+        minlength="{{ $field->min_length }}"
+    @endif
+
+    @if($field->max_length)
+        maxlength="{{ $field->max_length }}"
+    @endif
+
+    @if($field->min_value !== null)
+        min="{{ $field->min_value }}"
+    @endif
+
+    @if($field->max_value !== null)
+        max="{{ $field->max_value }}"
+    @endif
+
+    {{ $field->is_required ? 'required' : '' }}
+>
+
+@endif
+
+
+@if(
+    $field->description &&
+    !in_array(
+        $field->type,
+        ['checkbox']
+    )
+)
+
+<div class="field-help">
+    {{ $field->description }}
+</div>
+
+@endif
+
+
+</div>
+
+@endif
+
+
+@endforeach
+
+
+</div>
+
+
+@if($form->payment_enabled)
+
+<section class="payment-box">
+
+<h2 class="payment-title">
+    Informasi Pembayaran
+</h2>
+
+
+@if($form->show_price)
+
+<div>
+
+<span
+    class="price"
+    id="calculatedPrice"
+>
+    Rp{{ number_format(
+        $effectivePrice,
+        0,
+        ',',
+        '.'
+    ) }}
+</span>
+
+@if(
+    $form->promo_price > 0 &&
+    $form->payment_amount > $form->promo_price
+)
+
+<span class="old-price">
+
+    Rp{{ number_format(
+        (float)$form->payment_amount,
+        0,
+        ',',
+        '.'
+    ) }}
+
+</span>
+
+@endif
+
+</div>
+
+@endif
+
+
+<div class="payment-grid">
+
+
+@if($form->bank_name)
+
+<div class="payment-item">
+
+<strong>
+    {{ $form->bank_name }}
+</strong>
+
+<br>
+
+{{ $form->bank_account_number }}
+
+<br>
+
+{{ $form->bank_account_name }}
+
+</div>
+
+@endif
+
+
+@if($form->ewallet_name)
+
+<div class="payment-item">
+
+<strong>
+    {{ $form->ewallet_name }}
+</strong>
+
+<br>
+
+{{ $form->ewallet_number }}
+
+</div>
+
+@endif
+
+
+@if($form->payment_deadline)
+
+<div class="payment-item">
+
+<strong>Batas Pembayaran</strong>
+
+<br>
+
+{{ $form->payment_deadline->format('d M Y H:i') }}
+
+</div>
+
+@endif
+
+
+</div>
+
+
+@if($form->payment_instructions)
+
+<div
+    class="field-help"
+    style="margin-top:18px"
+>
+
+{!! nl2br(e($form->payment_instructions)) !!}
+
+</div>
+
+@endif
+
+
+@if($form->qris_image)
+
+<img
+    src="{{ Storage::disk('public')->url($form->qris_image) }}"
+    alt="QRIS"
+    class="qris"
+>
+
+@endif
+
+
+</section>
+
+@endif
+
+
+<button
+    type="submit"
+    class="submit-btn"
+>
+
+{{ $form->submit_button_text ?: 'Kirim Formulir' }}
+
+</button>
+
+
+</form>
+
+@endif
+
+
+</div>
+
+</section>
+
+</div>
+
 </main>
+
 
 @include('partials.footer')
 
+
+<script>
+
+const priceVariations =
+    @json($variations);
+
+const basePrice =
+    {{ (float)$effectivePrice }};
+
+const category =
+    @json($form->category);
+
+
+function getNamedValue(name){
+
+    const fields =
+        document.querySelectorAll(
+            `[name="${name}"], [name="${name}[]"]`
+        );
+
+    if(!fields.length){
+        return null;
+    }
+
+    if(
+        fields[0].type === 'radio'
+    ){
+        const checked =
+            document.querySelector(
+                `[name="${name}"]:checked`
+            );
+
+        return checked
+            ? checked.value
+            : null;
+    }
+
+    if(
+        fields[0].type === 'checkbox'
+    ){
+
+        const checked =
+            [...fields]
+            .filter(el => el.checked)
+            .map(el => el.value);
+
+        if(fields.length === 1){
+            return checked.length
+                ? checked[0]
+                : null;
+        }
+
+        return checked;
+    }
+
+    return fields[0].value;
+}
+
+
+function conditionMatches(
+    actual,
+    operator,
+    expected
+){
+
+    switch(operator){
+
+        case '!=':
+        case 'not_equals':
+            return String(actual ?? '') !==
+                   String(expected ?? '');
+
+        case 'contains':
+
+            if(Array.isArray(actual)){
+                return actual.includes(expected);
+            }
+
+            return String(actual ?? '')
+                .toLowerCase()
+                .includes(
+                    String(expected ?? '')
+                    .toLowerCase()
+                );
+
+        case 'not_contains':
+
+            if(Array.isArray(actual)){
+                return !actual.includes(expected);
+            }
+
+            return !String(actual ?? '')
+                .toLowerCase()
+                .includes(
+                    String(expected ?? '')
+                    .toLowerCase()
+                );
+
+        case 'empty':
+            return (
+                actual === null ||
+                actual === '' ||
+                (
+                    Array.isArray(actual) &&
+                    actual.length === 0
+                )
+            );
+
+        case 'not_empty':
+            return !(
+                actual === null ||
+                actual === '' ||
+                (
+                    Array.isArray(actual) &&
+                    actual.length === 0
+                )
+            );
+
+        default:
+            return String(actual ?? '') ===
+                   String(expected ?? '');
+    }
+}
+
+
+function updateConditionalFields(){
+
+    document
+        .querySelectorAll(
+            '[data-conditional="1"]'
+        )
+        .forEach(wrapper => {
+
+            const trigger =
+                wrapper.dataset
+                    .conditionalField;
+
+            const operator =
+                wrapper.dataset
+                    .conditionalOperator
+                || 'equals';
+
+            const expected =
+                wrapper.dataset
+                    .conditionalValue;
+
+            const actual =
+                getNamedValue(trigger);
+
+            const visible =
+                conditionMatches(
+                    actual,
+                    operator,
+                    expected
+                );
+
+            wrapper
+                .classList
+                .toggle(
+                    'conditional-hidden',
+                    !visible
+                );
+
+            wrapper
+                .querySelectorAll(
+                    'input,select,textarea'
+                )
+                .forEach(input => {
+
+                    input.disabled =
+                        !visible;
+
+                    if(
+                        visible &&
+                        input.dataset.wasRequired ===
+                            '1'
+                    ){
+                        input.required = true;
+                    }
+
+                    if(!visible){
+
+                        if(input.required){
+                            input.dataset.wasRequired =
+                                '1';
+                        }
+
+                        input.required = false;
+                    }
+
+                });
+
+        });
+}
+
+
+function variationPrice(value){
+
+    for(const variation of priceVariations){
+
+        if(!variation){
+            continue;
+        }
+
+        const variationValue =
+            variation.value ??
+            variation.option ??
+            variation.label ??
+            variation.name;
+
+        if(
+            String(variationValue) ===
+            String(value)
+        ){
+            const price =
+                Number(
+                    variation.price ??
+                    variation.amount
+                );
+
+            if(!Number.isNaN(price)){
+                return price;
+            }
+        }
+    }
+
+    return null;
+}
+
+
+function updatePrice(){
+
+    let price =
+        Number(basePrice || 0);
+
+    @foreach($priceFields as $priceField)
+
+        {
+            const selected =
+                getNamedValue(
+                    @json($priceField->name)
+                );
+
+            const variation =
+                variationPrice(selected);
+
+            if(variation !== null){
+                price = variation;
+            }
+        }
+
+    @endforeach
+
+
+    if(category === 'jacket_po'){
+
+        const qty =
+            Number(
+                getNamedValue(
+                    'jumlah_jaket'
+                ) || 1
+            );
+
+        price *=
+            Math.max(1,qty);
+    }
+
+
+    const display =
+        document.getElementById(
+            'calculatedPrice'
+        );
+
+    if(display){
+
+        display.textContent =
+            'Rp' +
+            new Intl.NumberFormat(
+                'id-ID'
+            ).format(price);
+    }
+}
+
+
+document
+    .querySelectorAll(
+        'input,select,textarea'
+    )
+    .forEach(el => {
+
+        el.addEventListener(
+            'change',
+            () => {
+                updateConditionalFields();
+                updatePrice();
+            }
+        );
+
+        el.addEventListener(
+            'input',
+            () => {
+                updateConditionalFields();
+                updatePrice();
+            }
+        );
+
+    });
+
+
+updateConditionalFields();
+updatePrice();
+
+</script>
+
+
 </body>
+
 </html>

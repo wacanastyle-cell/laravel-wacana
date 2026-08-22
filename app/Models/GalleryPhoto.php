@@ -4,6 +4,7 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Support\Facades\Storage;
 
 class GalleryPhoto extends Model
 {
@@ -12,8 +13,14 @@ class GalleryPhoto extends Model
     protected $fillable = [
         'gallery_id',
         'image',
+        'title',
         'caption',
+        'alt_text',
         'sort_order',
+    ];
+
+    protected $casts = [
+        'sort_order' => 'integer',
     ];
 
     public function gallery()
@@ -23,6 +30,8 @@ class GalleryPhoto extends Model
 
     public function getImageUrlAttribute(): ?string
     {
-        return $this->image ? \Illuminate\Support\Facades\Storage::disk('public')->url($this->image) : null;
+        return $this->image
+            ? Storage::disk('public')->url($this->image)
+            : null;
     }
 }

@@ -438,7 +438,7 @@
 
     <div class="drawer-cta">
         <a
-            href="{{ route('public.form.show', 'open-po-jaket') }}"
+            href="{{ route('public.forms') }}"
             class="btn btn-red"
             style="width:100%"
             onclick="toggleDrawer(false)"

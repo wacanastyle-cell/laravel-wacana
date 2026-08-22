@@ -1,0 +1,739 @@
+
+/* =========================================================
+   WACANA STYLE ADMIN UI
+   Laravel 11 + Filament 3
+   Tema: Black / White / Wacana Red
+========================================================= */
+
+:root {
+    --ws-red: #ef2029;
+    --ws-red-dark: #c9141c;
+    --ws-black: #0f1013;
+    --ws-black-2: #17191e;
+    --ws-black-3: #20232a;
+    --ws-white: #ffffff;
+    --ws-bg: #f7f7f8;
+    --ws-border: #e7e8eb;
+    --ws-text: #17191f;
+    --ws-muted: #737985;
+}
+
+/* =========================================================
+   GLOBAL
+========================================================= */
+
+.fi-body {
+    background: var(--ws-bg) !important;
+}
+
+.fi-main {
+    background: var(--ws-bg) !important;
+}
+
+/* =========================================================
+   TOPBAR
+========================================================= */
+
+.fi-topbar {
+    background: var(--ws-black) !important;
+    border-bottom: 1px solid #272930 !important;
+    box-shadow: none !important;
+}
+
+.fi-topbar * {
+    color: #ffffff !important;
+}
+
+.fi-topbar .fi-icon-btn:hover {
+    background: rgba(239, 32, 41, .15) !important;
+}
+
+.fi-topbar .fi-icon-btn {
+    border-radius: 10px !important;
+}
+
+/* =========================================================
+   SIDEBAR
+========================================================= */
+
+.fi-sidebar {
+    background: linear-gradient(
+        180deg,
+        #181a1f 0%,
+        #111216 100%
+    ) !important;
+
+    border-right: 1px solid #292b31 !important;
+}
+
+/* Sidebar header */
+
+.fi-sidebar-header {
+    background: #0f1013 !important;
+    border-bottom: 1px solid #292b31 !important;
+}
+
+/* Sidebar text */
+
+.fi-sidebar *,
+.fi-sidebar-item-label {
+    color: #e8e9ec;
+}
+
+/* Group */
+
+.fi-sidebar-group {
+    padding-top: 8px !important;
+}
+
+.fi-sidebar-group-label {
+    color: #8e939e !important;
+
+    font-size: 10px !important;
+    font-weight: 800 !important;
+
+    letter-spacing: .12em !important;
+    text-transform: uppercase !important;
+
+    padding-left: 14px !important;
+    margin-bottom: 7px !important;
+}
+
+/* =========================================================
+   SIDEBAR MENU
+========================================================= */
+
+.fi-sidebar-item {
+    margin-bottom: 3px !important;
+}
+
+.fi-sidebar-item-btn {
+    margin-left: 9px !important;
+    margin-right: 9px !important;
+
+    min-height: 42px !important;
+
+    border-radius: 10px !important;
+
+    transition:
+        background .18s ease,
+        transform .18s ease,
+        box-shadow .18s ease !important;
+}
+
+/* Hover */
+
+.fi-sidebar-item-btn:hover {
+    background: rgba(239, 32, 41, .10) !important;
+
+    transform: translateX(2px);
+}
+
+/* Active */
+
+.fi-sidebar-item-active > .fi-sidebar-item-btn {
+    background: linear-gradient(
+        135deg,
+        #ef2029 0%,
+        #d91620 100%
+    ) !important;
+
+    box-shadow:
+        0 7px 18px rgba(239, 32, 41, .20) !important;
+}
+
+.fi-sidebar-item-active
+.fi-sidebar-item-label,
+.fi-sidebar-item-active
+.fi-sidebar-item-icon {
+    color: #ffffff !important;
+}
+
+/* Icons */
+
+.fi-sidebar-item-icon {
+    color: #aeb2ba !important;
+}
+
+.fi-sidebar-item-btn:hover
+.fi-sidebar-item-icon {
+    color: #ffffff !important;
+}
+
+/* =========================================================
+   BADGE CALON MEMBER
+========================================================= */
+
+.fi-sidebar-item-badge {
+    background: var(--ws-red) !important;
+    color: #ffffff !important;
+
+    border-radius: 999px !important;
+
+    min-width: 22px !important;
+    min-height: 22px !important;
+
+    font-weight: 800 !important;
+
+    box-shadow:
+        0 4px 10px rgba(239, 32, 41, .25);
+}
+
+/* =========================================================
+   PAGE HEADER
+========================================================= */
+
+.fi-header {
+    padding-top: 28px !important;
+    padding-bottom: 22px !important;
+}
+
+.fi-header-heading {
+    color: var(--ws-text) !important;
+
+    font-weight: 800 !important;
+
+    letter-spacing: -.035em !important;
+}
+
+/* =========================================================
+   SECTION / CARD
+========================================================= */
+
+.fi-section,
+.fi-wi-widget,
+.fi-wi-stats-overview-stat,
+.fi-ta-ctn {
+    background: #ffffff !important;
+
+    border: 1px solid var(--ws-border) !important;
+
+    border-radius: 16px !important;
+
+    box-shadow:
+        0 4px 18px rgba(15, 16, 19, .045) !important;
+}
+
+/* Hover card */
+
+.fi-wi-stats-overview-stat {
+    transition:
+        transform .18s ease,
+        box-shadow .18s ease !important;
+}
+
+.fi-wi-stats-overview-stat:hover {
+    transform: translateY(-3px);
+
+    box-shadow:
+        0 12px 28px rgba(15, 16, 19, .08) !important;
+}
+
+/* =========================================================
+   STATISTIC CARDS
+========================================================= */
+
+.fi-wi-stats-overview-stat-value {
+    font-weight: 800 !important;
+
+    color: #15161a !important;
+
+    letter-spacing: -.03em !important;
+}
+
+.fi-wi-stats-overview-stat-label {
+    font-weight: 600 !important;
+
+    color: #707580 !important;
+}
+
+.fi-wi-stats-overview-stat-description {
+    color: #8b909a !important;
+}
+
+/* =========================================================
+   PRIMARY BUTTON
+========================================================= */
+
+.fi-btn-color-primary {
+    background: var(--ws-red) !important;
+
+    border-color: var(--ws-red) !important;
+
+    border-radius: 9px !important;
+
+    box-shadow:
+        0 5px 12px rgba(239, 32, 41, .16) !important;
+}
+
+.fi-btn-color-primary:hover {
+    background: var(--ws-red-dark) !important;
+
+    border-color: var(--ws-red-dark) !important;
+}
+
+/* =========================================================
+   LINKS
+========================================================= */
+
+.fi-link {
+    color: var(--ws-red) !important;
+}
+
+.fi-link:hover {
+    color: var(--ws-red-dark) !important;
+}
+
+/* =========================================================
+   TABLE
+========================================================= */
+
+.fi-ta-ctn {
+    overflow: hidden !important;
+}
+
+.fi-ta-table thead th {
+    background: #fafafa !important;
+
+    color: #6f747e !important;
+
+    font-size: 12px !important;
+
+    font-weight: 700 !important;
+
+    text-transform: uppercase !important;
+
+    letter-spacing: .04em !important;
+}
+
+.fi-ta-table tbody tr {
+    transition: background .15s ease !important;
+}
+
+.fi-ta-table tbody tr:hover {
+    background: #fff7f7 !important;
+}
+
+/* =========================================================
+   FORM INPUT
+========================================================= */
+
+.fi-input,
+.fi-select-input,
+.fi-textarea,
+.fi-fo-field-wrp input,
+.fi-fo-field-wrp textarea,
+.fi-fo-field-wrp select {
+    border-radius: 10px !important;
+}
+
+.fi-input:focus,
+.fi-textarea:focus {
+    border-color: var(--ws-red) !important;
+
+    box-shadow:
+        0 0 0 3px rgba(239, 32, 41, .10) !important;
+}
+
+/* =========================================================
+   BADGE
+========================================================= */
+
+.fi-badge {
+    border-radius: 999px !important;
+
+    font-weight: 700 !important;
+}
+
+/* =========================================================
+   MODAL
+========================================================= */
+
+.fi-modal-window {
+    border-radius: 18px !important;
+
+    box-shadow:
+        0 24px 60px rgba(0, 0, 0, .20) !important;
+}
+
+/* =========================================================
+   DROPDOWN
+========================================================= */
+
+.fi-dropdown-panel {
+    border-radius: 12px !important;
+
+    border: 1px solid var(--ws-border) !important;
+
+    box-shadow:
+        0 12px 30px rgba(15, 16, 19, .12) !important;
+}
+
+/* =========================================================
+   NOTIFICATION
+========================================================= */
+
+.fi-no-notification {
+    border-radius: 12px !important;
+}
+
+/* =========================================================
+   SCROLLBAR SIDEBAR
+========================================================= */
+
+.fi-sidebar::-webkit-scrollbar {
+    width: 5px;
+}
+
+.fi-sidebar::-webkit-scrollbar-track {
+    background: transparent;
+}
+
+.fi-sidebar::-webkit-scrollbar-thumb {
+    background: #363941;
+
+    border-radius: 999px;
+}
+
+.fi-sidebar::-webkit-scrollbar-thumb:hover {
+    background: #555963;
+}
+
+/* =========================================================
+   MOBILE
+========================================================= */
+
+@media (max-width: 768px) {
+
+    .fi-main {
+        padding-left: 12px !important;
+        padding-right: 12px !important;
+    }
+
+    .fi-header {
+        padding-top: 18px !important;
+        padding-bottom: 16px !important;
+    }
+
+    .fi-header-heading {
+        font-size: 1.45rem !important;
+    }
+
+    .fi-wi-stats-overview-stat {
+        border-radius: 14px !important;
+    }
+}
+
+/* =========================================================
+   END WACANA STYLE ADMIN UI
+========================================================= */
+
+
+/* =========================================================
+   WACANA STYLE - MOBILE SIDEBAR FIX
+========================================================= */
+
+@media (max-width: 768px) {
+
+    /* Jangan sembunyikan sidebar secara permanen */
+    .fi-sidebar {
+        z-index: 50 !important;
+    }
+
+    /* Sidebar saat drawer terbuka */
+    .fi-sidebar-open .fi-sidebar,
+    html.fi-sidebar-open .fi-sidebar,
+    body.fi-sidebar-open .fi-sidebar {
+        visibility: visible !important;
+        opacity: 1 !important;
+    }
+
+    /* Tombol hamburger Filament */
+    .fi-topbar .fi-sidebar-open-btn,
+    .fi-topbar button[aria-label*="sidebar"],
+    .fi-topbar button[aria-label*="Sidebar"] {
+        display: inline-flex !important;
+        visibility: visible !important;
+        opacity: 1 !important;
+        z-index: 60 !important;
+    }
+
+    /* Topbar mobile */
+    .fi-topbar {
+        position: relative !important;
+        z-index: 40 !important;
+    }
+
+    /* Sidebar drawer harus berada di atas konten */
+    .fi-sidebar {
+        z-index: 50 !important;
+    }
+
+    /* Overlay sidebar */
+    .fi-sidebar-close-overlay {
+        z-index: 45 !important;
+    }
+
+    /* Isi sidebar tetap dapat discroll */
+    .fi-sidebar-nav {
+        overflow-y: auto !important;
+        -webkit-overflow-scrolling: touch !important;
+    }
+
+    /* Menu jangan terlalu kecil di HP */
+    .fi-sidebar-item-btn {
+        min-height: 44px !important;
+        margin-left: 8px !important;
+        margin-right: 8px !important;
+    }
+
+    /* Area sidebar mobile */
+    .fi-sidebar-header {
+        min-height: 64px !important;
+    }
+
+    /* Pastikan group menu tidak hilang */
+    .fi-sidebar-group {
+        display: block !important;
+    }
+
+    .fi-sidebar-group-items {
+        display: block !important;
+    }
+
+}
+
+/* =========================================================
+   TABLET
+========================================================= */
+
+@media (min-width: 769px) and (max-width: 1024px) {
+
+    .fi-sidebar {
+        z-index: 50 !important;
+    }
+
+    .fi-sidebar-item-btn {
+        min-height: 43px !important;
+    }
+
+}
+
+
+/* =========================================================
+   WACANA STYLE
+   SIDEBAR TOGGLE - FILAMENT 3
+========================================================= */
+
+/*
+ * Filament 3 menggunakan:
+ *
+ * .fi-topbar-open-sidebar-btn
+ * .fi-topbar-close-sidebar-btn
+ *
+ * untuk toggle sidebar.
+ */
+
+/* Tombol buka sidebar */
+.fi-topbar-open-sidebar-btn {
+    display: inline-flex !important;
+    align-items: center !important;
+    justify-content: center !important;
+
+    width: 42px !important;
+    height: 42px !important;
+
+    min-width: 42px !important;
+
+    margin-inline-end: 10px !important;
+
+    border-radius: 10px !important;
+
+    background: #ef2029 !important;
+
+    color: #ffffff !important;
+
+    box-shadow:
+        0 5px 14px rgba(239, 32, 41, .22) !important;
+}
+
+/* Icon hamburger */
+.fi-topbar-open-sidebar-btn svg {
+    width: 22px !important;
+    height: 22px !important;
+
+    color: #ffffff !important;
+}
+
+/* Hover */
+.fi-topbar-open-sidebar-btn:hover {
+    background: #d91620 !important;
+}
+
+/* Tombol tutup sidebar */
+.fi-topbar-close-sidebar-btn {
+    display: inline-flex !important;
+    align-items: center !important;
+    justify-content: center !important;
+
+    width: 42px !important;
+    height: 42px !important;
+
+    min-width: 42px !important;
+
+    margin-inline-end: 10px !important;
+
+    border-radius: 10px !important;
+
+    background: #ef2029 !important;
+
+    color: #ffffff !important;
+
+    box-shadow:
+        0 5px 14px rgba(239, 32, 41, .22) !important;
+}
+
+.fi-topbar-close-sidebar-btn svg {
+    width: 22px !important;
+    height: 22px !important;
+
+    color: #ffffff !important;
+}
+
+/* =========================================================
+   MOBILE
+========================================================= */
+
+@media (max-width: 768px) {
+
+    .fi-topbar-open-sidebar-btn,
+    .fi-topbar-close-sidebar-btn {
+        display: inline-flex !important;
+
+        width: 40px !important;
+        height: 40px !important;
+
+        min-width: 40px !important;
+
+        margin-inline-end: 8px !important;
+    }
+
+    .fi-topbar-open-sidebar-btn svg,
+    .fi-topbar-close-sidebar-btn svg {
+        width: 21px !important;
+        height: 21px !important;
+    }
+
+    /*
+     * Sidebar drawer harus berada di atas konten.
+     */
+    .fi-sidebar {
+        z-index: 60 !important;
+    }
+
+    /*
+     * Overlay berada di bawah sidebar.
+     */
+    .fi-sidebar-close-overlay {
+        z-index: 55 !important;
+    }
+
+    /*
+     * Topbar tetap di atas halaman.
+     */
+    .fi-topbar {
+        z-index: 70 !important;
+    }
+
+}
+
+/* =========================================================
+   DESKTOP
+========================================================= */
+
+@media (min-width: 769px) {
+
+    .fi-topbar-open-sidebar-btn,
+    .fi-topbar-close-sidebar-btn {
+        display: inline-flex !important;
+    }
+
+}
+
+
+/* =========================================================
+   WACANA STYLE - DASHBOARD
+========================================================= */
+
+.fi-dashboard-page .fi-section,
+.fi-dashboard-page .fi-wi-widget {
+    border-radius: 18px !important;
+}
+
+.fi-dashboard-page .fi-wi-stats-overview {
+    gap: 16px !important;
+}
+
+.fi-dashboard-page .fi-wi-stats-overview-stat {
+    border-radius: 18px !important;
+    border: 1px solid rgba(0, 0, 0, 0.06) !important;
+    transition: transform .18s ease, box-shadow .18s ease !important;
+}
+
+.fi-dashboard-page .fi-wi-stats-overview-stat:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 10px 28px rgba(0, 0, 0, .08) !important;
+}
+
+.fi-dashboard-page .fi-wi-table {
+    border-radius: 18px !important;
+    overflow: hidden !important;
+}
+
+.fi-dashboard-page .fi-wi-table thead th {
+    font-weight: 700 !important;
+}
+
+.fi-dashboard-page .fi-wi-table tbody tr {
+    transition: background-color .15s ease !important;
+}
+
+.fi-dashboard-page .fi-wi-table tbody tr:hover {
+    background: rgba(239, 32, 41, .035) !important;
+}
+
+.fi-dashboard-page .fi-wi-table .fi-badge {
+    font-weight: 700 !important;
+}
+
+.fi-dashboard-page .fi-header-heading {
+    font-weight: 800 !important;
+    letter-spacing: -.02em !important;
+}
+
+/* Dashboard mobile */
+
+@media (max-width: 768px) {
+
+    .fi-dashboard-page .fi-wi-stats-overview {
+        grid-template-columns: repeat(2, minmax(0, 1fr)) !important;
+        gap: 10px !important;
+    }
+
+    .fi-dashboard-page .fi-wi-stats-overview-stat {
+        border-radius: 14px !important;
+    }
+
+    .fi-dashboard-page .fi-wi-stats-overview-stat .fi-wi-stats-overview-stat-value {
+        font-size: 1.35rem !important;
+    }
+
+    .fi-dashboard-page .fi-wi-table {
+        overflow-x: auto !important;
+    }
+
+    .fi-dashboard-page .fi-wi-table table {
+        min-width: 720px !important;
+    }
+
+}

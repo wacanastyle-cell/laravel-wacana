@@ -13,7 +13,20 @@ class EditBlog extends EditRecord
     protected function getHeaderActions(): array
     {
         return [
+            Actions\Action::make('view')
+                ->label('Preview Website')
+                ->icon('heroicon-o-eye')
+                ->url(fn () => route('public.blog.show', [
+                    'slug' => $this->record->slug,
+                ]))
+                ->openUrlInNewTab(),
+
             Actions\DeleteAction::make(),
         ];
+    }
+
+    protected function getRedirectUrl(): string
+    {
+        return $this->getResource()::getUrl('index');
     }
 }

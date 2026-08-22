@@ -8,12 +8,17 @@ use Filament\Resources\Pages\ManageRecords;
 
 class ManageForms extends ManageRecords
 {
-    protected static string $resource = FormResource::class;
+    protected static string $resource =
+        FormResource::class;
 
     protected function getHeaderActions(): array
     {
         return [
-            Actions\CreateAction::make(),
+
+            Actions\CreateAction::make()
+                ->label('Buat Formulir')
+                ->icon('heroicon-o-plus'),
+
         ];
     }
 }

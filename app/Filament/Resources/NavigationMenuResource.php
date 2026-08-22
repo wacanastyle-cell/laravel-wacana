@@ -12,6 +12,8 @@ use Filament\Tables\Table;
 
 class NavigationMenuResource extends Resource
 {
+
+    protected static bool $shouldRegisterNavigation = false;
     protected static ?string $model = NavigationMenu::class;
 
     protected static ?string $navigationIcon = 'heroicon-o-list-bullet';

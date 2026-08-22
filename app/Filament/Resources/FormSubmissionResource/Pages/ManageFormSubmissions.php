@@ -3,17 +3,18 @@
 namespace App\Filament\Resources\FormSubmissionResource\Pages;
 
 use App\Filament\Resources\FormSubmissionResource;
-use Filament\Actions;
+use App\Filament\Resources\FormSubmissionResource\Widgets\FormSubmissionStats;
 use Filament\Resources\Pages\ManageRecords;
 
 class ManageFormSubmissions extends ManageRecords
 {
-    protected static string $resource = FormSubmissionResource::class;
+    protected static string $resource =
+        FormSubmissionResource::class;
 
-    protected function getHeaderActions(): array
+    protected function getHeaderWidgets(): array
     {
         return [
-            Actions\CreateAction::make(),
+            FormSubmissionStats::class,
         ];
     }
 }

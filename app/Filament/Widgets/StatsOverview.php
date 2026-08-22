@@ -14,22 +14,36 @@ class StatsOverview extends BaseWidget
 {
     protected function getStats(): array
     {
+        $newSubmissions = FormSubmission::where('status', 'new')->count();
+
         return [
-            Stat::make('Total Anggota', Member::count())
-                ->description('Jumlah member aktif dan non-aktif')
+            Stat::make('Total Member', Member::count())
+                ->description('Seluruh data member')
+                ->descriptionIcon('heroicon-m-users')
                 ->color('success'),
-            Stat::make('Total Galeri', Gallery::count())
-                ->description('Album galeri yang tersedia')
-                ->color('info'),
-            Stat::make('Total Foto', GalleryPhoto::count())
-                ->description('Jumlah foto dalam album')
-                ->color('warning'),
+
             Stat::make('Total Formulir', Form::count())
-                ->description('Semua formulir yang dibuat')
+                ->description('Formulir yang tersedia')
+                ->descriptionIcon('heroicon-m-document-text')
                 ->color('primary'),
+
             Stat::make('Total Submission', FormSubmission::count())
-                ->description('Semua data masuk dari formulir')
-                ->color('danger'),
+                ->description('Semua data yang masuk')
+                ->descriptionIcon('heroicon-m-inbox')
+                ->color('info'),
+
+            Stat::make('Submission Baru', $newSubmissions)
+                ->description(
+                    $newSubmissions > 0
+                        ? 'Perlu diperiksa'
+                        : 'Tidak ada submission baru'
+                )
+                ->descriptionIcon(
+                    $newSubmissions > 0
+                        ? 'heroicon-m-bell-alert'
+                        : 'heroicon-m-check-circle'
+                )
+                ->color($newSubmissions > 0 ? 'danger' : 'success'),
         ];
     }
 }

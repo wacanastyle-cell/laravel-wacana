@@ -12,11 +12,6 @@ class Blog extends Model
 {
     use HasFactory;
 
-    /**
-     * The attributes that are mass assignable.
-     *
-     * @var array<int, string>
-     */
     protected $fillable = [
         'user_id',
         'title',
@@ -26,19 +21,58 @@ class Blog extends Model
         'featured_image',
         'status',
         'published_at',
+        'scheduled_at',
+
+        'category',
+        'tags',
+        'featured',
+
         'show_title',
         'show_excerpt',
+        'show_thumbnail',
+        'show_author',
+        'show_date',
+        'show_category',
+        'show_tags',
+        'show_reading_time',
+
+        'seo_title',
+        'meta_description',
+        'focus_keyword',
+        'canonical_url',
+
+        'og_title',
+        'og_description',
+        'og_image',
+
+        'views',
+        'reading_time',
+        'word_count',
+        'character_count',
+
+        'autosave',
     ];
 
-    /**
-     * The attributes that should be cast.
-     *
-     * @var array<string, string>
-     */
     protected $casts = [
         'published_at' => 'datetime',
+        'scheduled_at' => 'datetime',
+
         'show_title' => 'boolean',
         'show_excerpt' => 'boolean',
+        'show_thumbnail' => 'boolean',
+        'show_author' => 'boolean',
+        'show_date' => 'boolean',
+        'show_category' => 'boolean',
+        'show_tags' => 'boolean',
+        'show_reading_time' => 'boolean',
+
+        'featured' => 'boolean',
+        'autosave' => 'boolean',
+
+        'views' => 'integer',
+        'reading_time' => 'integer',
+        'word_count' => 'integer',
+        'character_count' => 'integer',
     ];
 
     protected static function booted(): void
@@ -48,16 +82,37 @@ class Blog extends Model
                 $blog->user_id = Auth::id();
             }
 
+            self::calculateStatistics($blog);
+
             if ($blog->status === 'published' && is_null($blog->published_at)) {
                 $blog->published_at = now();
             }
         });
 
         static::updating(function (Blog $blog) {
+            self::calculateStatistics($blog);
+
             if ($blog->status === 'published' && is_null($blog->published_at)) {
                 $blog->published_at = now();
             }
         });
+    }
+
+    protected static function calculateStatistics(Blog $blog): void
+    {
+        $html = (string) $blog->content;
+
+        $text = trim(strip_tags($html));
+
+        $blog->word_count = $text === ''
+            ? 0
+            : str_word_count($text);
+
+        $blog->character_count = mb_strlen($text);
+
+        $blog->reading_time = $blog->word_count > 0
+            ? max(1, (int) ceil($blog->word_count / 200))
+            : 0;
     }
 
     public function user(): BelongsTo

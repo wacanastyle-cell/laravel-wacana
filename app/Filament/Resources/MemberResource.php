@@ -22,7 +22,9 @@ class MemberResource extends Resource
 
     protected static ?string $navigationIcon = 'heroicon-o-users';
 
-    protected static ?string $navigationGroup = 'Data';
+    protected static ?string $navigationGroup = 'Pendaftaran';
+    protected static ?string $navigationLabel = 'Calon Member';
+    protected static ?int $navigationSort = 1;
 
     public static function form(Form $form): Form
     {
@@ -80,6 +82,17 @@ class MemberResource extends Resource
             ])
             ->defaultSort('created_at', 'desc');
     }
+
+    public static function getNavigationBadge(): ?string
+    {
+        return (string) static::getModel()::count();
+    }
+
+    public static function getNavigationBadgeColor(): ?string
+    {
+        return 'danger';
+    }
+
 
     public static function getPages(): array
     {

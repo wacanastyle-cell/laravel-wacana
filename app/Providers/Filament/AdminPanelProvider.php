@@ -11,6 +11,7 @@ use Filament\Panel;
 use Filament\PanelProvider;
 use Filament\Support\Colors\Color;
 use Filament\Widgets;
+use Filament\View\PanelsRenderHook;
 use Illuminate\Cookie\Middleware\AddQueuedCookiesToResponse;
 use Illuminate\Cookie\Middleware\EncryptCookies;
 use Illuminate\Foundation\Http\Middleware\VerifyCsrfToken;
@@ -26,6 +27,7 @@ class AdminPanelProvider extends PanelProvider
             ->default()
             ->id('admin')
             ->path('admin')
+            ->sidebarCollapsibleOnDesktop()
             ->login()
             ->brandName('Wacana Style Admin')
             ->colors([
@@ -42,6 +44,18 @@ class AdminPanelProvider extends PanelProvider
             ->widgets([
                 \App\Filament\Widgets\StatsOverview::class,
             ])
+            ->navigationGroups([
+                'Konten',
+                'Formulir',
+                'Pendaftaran',
+                'Administrasi',
+            ])
+            ->renderHook(
+                PanelsRenderHook::STYLES_AFTER,
+                fn (): string => '<style>' .
+                    file_get_contents(resource_path('css/filament/admin.css')) .
+                    '</style>',
+            )
             ->middleware([
                 EncryptCookies::class,
                 AddQueuedCookiesToResponse::class,
