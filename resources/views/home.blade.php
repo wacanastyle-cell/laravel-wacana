@@ -7,9 +7,22 @@
     <meta name="google-site-verification" content="_cpKGNoFoejJEVqCD380wXY_Ds3HG6OUtEH5PAOLbI4" />
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <meta name="description" content="Wacana Style — komunitas motor Jawa Tengah. Touring, kopdar, persaudaraan, dan satu aspal. Gabung bersama kami.">
+    <meta name="description" content="Wacana Style adalah komunitas motor Tegal dan sekitarnya untuk touring, kopdar, ride out, berbagi cerita, dan membangun persaudaraan tanpa memandang jenis motor.">
     <meta name="theme-color" content="#09090b">
-    <title>Wacana Style — Satu Aspal, Satu Keluarga</title>
+    <title>Wacana Style – Komunitas Motor Tegal &amp; Sekitarnya</title>
+    <link rel="canonical" href="https://wacanastyle.my.id/">
+
+    <meta property="og:type" content="website">
+    <meta property="og:title" content="Wacana Style – Komunitas Motor Tegal &amp; Sekitarnya">
+    <meta property="og:description" content="Komunitas motor Tegal dan sekitarnya untuk touring, kopdar, ride out, dan membangun persaudaraan sesama pengendara.">
+    <meta property="og:url" content="https://wacanastyle.my.id/">
+    <meta property="og:site_name" content="Wacana Style">
+    <meta property="og:image" content="https://wacanastyle.my.id/storage/icon-logo/logo.png">
+
+    <meta name="twitter:card" content="summary_large_image">
+    <meta name="twitter:title" content="Wacana Style – Komunitas Motor Tegal &amp; Sekitarnya">
+    <meta name="twitter:description" content="Komunitas motor Tegal dan sekitarnya untuk touring, kopdar, ride out, dan membangun persaudaraan.">
+    <meta name="twitter:image" content="https://wacanastyle.my.id/storage/icon-logo/logo.png">
 
     <!-- Google Tag Manager -->
     <script>

@@ -34,6 +34,7 @@
 <html lang="id">
 
 <head>
+    <meta name="csrf-token" content="{{ csrf_token() }}">
     <link rel="icon" type="image/png" href="{{ asset('storage/icon-logo/icon.png') }}">
     <link rel="shortcut icon" type="image/png" href="{{ asset('storage/icon-logo/icon.png') }}">
     <link rel="apple-touch-icon" href="{{ asset('storage/icon-logo/icon.png') }}">
