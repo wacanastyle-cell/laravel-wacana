@@ -438,7 +438,7 @@
 
     <div class="drawer-cta">
         <a
-            href="{{ route('public.forms') }}"
+            href="https://wacanastyle.my.id/page/gabung-member-wacana-style-komunitas-motor"
             class="btn btn-red"
             style="width:100%"
             onclick="toggleDrawer(false)"
@@ -480,3 +480,429 @@ function toggleAbout(button) {
     );
 }
 </script>
+
+<style>
+/* FIX: jangan biarkan CSS konten Page memengaruhi link navigasi */
+header a,
+header a:hover,
+header a:focus,
+header a:active,
+header a:visited {
+    text-decoration: none !important;
+}
+</style>
+
+<style id="ws-drawer-unified-fix">
+
+/* ==================================================
+   WACANA STYLE - UNIFIED MOBILE DRAWER
+   Berlaku sama di seluruh halaman publik
+================================================== */
+
+.side-drawer {
+    position: fixed !important;
+    top: 0 !important;
+    right: 0 !important;
+
+    width: min(430px, 92vw) !important;
+    height: 100dvh !important;
+    min-height: 100vh !important;
+
+    padding: 26px 28px !important;
+
+    background: #0b0b0e !important;
+
+    border-left: 1px solid rgba(255,255,255,.08) !important;
+
+    box-shadow:
+        -25px 0 70px rgba(0,0,0,.45) !important;
+
+    z-index: 99999 !important;
+
+    overflow-y: auto !important;
+    overflow-x: hidden !important;
+
+    transform: translateX(105%) !important;
+
+    visibility: hidden !important;
+    opacity: 0 !important;
+
+    transition:
+        transform .35s ease,
+        opacity .25s ease,
+        visibility .35s ease !important;
+}
+
+
+/* DRAWER OPEN */
+
+.side-drawer.open {
+    transform: translateX(0) !important;
+
+    visibility: visible !important;
+    opacity: 1 !important;
+}
+
+
+/* HEADER DRAWER */
+
+.side-drawer .drawer-header {
+    display: flex !important;
+    align-items: center !important;
+    justify-content: space-between !important;
+
+    margin-bottom: 32px !important;
+}
+
+
+.side-drawer .drawer-title {
+    margin: 0 !important;
+
+    color: #fff !important;
+
+    font-size: 20px !important;
+    font-weight: 800 !important;
+}
+
+
+/* CLOSE BUTTON */
+
+.side-drawer .drawer-close {
+    display: flex !important;
+    align-items: center !important;
+    justify-content: center !important;
+
+    width: 46px !important;
+    height: 46px !important;
+
+    padding: 0 !important;
+
+    border: 1px solid rgba(255,255,255,.12) !important;
+    border-radius: 12px !important;
+
+    background: #131318 !important;
+
+    color: #fff !important;
+
+    cursor: pointer !important;
+}
+
+
+/* NAVIGATION */
+
+.side-drawer nav,
+.side-drawer .drawer-nav {
+    display: flex !important;
+    flex-direction: column !important;
+
+    gap: 4px !important;
+}
+
+
+.side-drawer nav > a,
+.side-drawer .drawer-nav > a,
+.side-drawer .drawer-link {
+    display: flex !important;
+    align-items: center !important;
+
+    width: 100% !important;
+
+    padding: 15px 16px !important;
+
+    border-radius: 10px !important;
+
+    color: #f4f4f5 !important;
+
+    font-size: 14px !important;
+    font-weight: 700 !important;
+
+    text-decoration: none !important;
+
+    transition:
+        background .2s ease,
+        color .2s ease !important;
+}
+
+
+.side-drawer nav > a:hover,
+.side-drawer .drawer-nav > a:hover,
+.side-drawer .drawer-link:hover {
+    background: rgba(255,255,255,.05) !important;
+
+    color: #ef2029 !important;
+}
+
+
+/* ABOUT DROPDOWN */
+
+.side-drawer .drawer-dropdown-toggle {
+    display: flex !important;
+    align-items: center !important;
+    justify-content: space-between !important;
+
+    width: 100% !important;
+
+    padding: 15px 16px !important;
+
+    border: 0 !important;
+    border-radius: 10px !important;
+
+    background: transparent !important;
+
+    color: #f4f4f5 !important;
+
+    font-size: 14px !important;
+    font-weight: 700 !important;
+
+    text-align: left !important;
+}
+
+
+.side-drawer .drawer-dropdown-menu {
+    padding: 4px 0 6px 14px !important;
+}
+
+
+/* CTA */
+
+.side-drawer .drawer-cta {
+    width: 100% !important;
+
+    margin-top: 20px !important;
+}
+
+
+.side-drawer .drawer-cta .btn,
+.side-drawer .drawer-cta .btn-red {
+    display: flex !important;
+    align-items: center !important;
+    justify-content: center !important;
+
+    gap: 10px !important;
+
+    width: 100% !important;
+
+    min-height: 56px !important;
+
+    padding: 15px 20px !important;
+
+    border: 0 !important;
+    border-radius: 12px !important;
+
+    background: #ef0b0b !important;
+
+    color: #fff !important;
+
+    font-size: 14px !important;
+    font-weight: 800 !important;
+
+    letter-spacing: .4px !important;
+
+    text-decoration: none !important;
+
+    box-shadow:
+        0 12px 30px rgba(239,11,11,.16) !important;
+}
+
+
+.side-drawer .drawer-cta .btn:hover,
+.side-drawer .drawer-cta .btn-red:hover {
+    background: #cf0909 !important;
+
+    color: #fff !important;
+
+    transform: translateY(-1px) !important;
+}
+
+
+/* OVERLAY */
+
+.drawer-overlay {
+    position: fixed !important;
+    inset: 0 !important;
+
+    z-index: 99990 !important;
+
+    background: rgba(0,0,0,.68) !important;
+
+    backdrop-filter: blur(5px) !important;
+    -webkit-backdrop-filter: blur(5px) !important;
+}
+
+
+/* TABLET */
+
+@media (max-width: 768px) {
+
+    .side-drawer {
+        width: min(430px, 92vw) !important;
+
+        padding:
+            24px
+            25px
+            40px !important;
+    }
+
+}
+
+
+/* HP KECIL */
+
+@media (max-width: 480px) {
+
+    .side-drawer {
+        width: 88vw !important;
+        max-width: 390px !important;
+
+        padding:
+            22px
+            20px
+            35px !important;
+    }
+
+    .side-drawer .drawer-cta .btn,
+    .side-drawer .drawer-cta .btn-red {
+        min-height: 54px !important;
+
+        font-size: 13px !important;
+    }
+
+}
+
+</style>
+
+
+<style id="ws-global-link-fix">
+
+/* ==================================================
+   WACANA STYLE - GLOBAL LINK STYLE
+   Hilangkan underline di seluruh website publik
+================================================== */
+
+a,
+a:link,
+a:visited,
+a:hover,
+a:focus,
+a:active {
+    text-decoration: none !important;
+}
+
+
+/* Pastikan elemen link turunan juga tidak mendapat garis */
+
+a *,
+a:hover *,
+a:focus *,
+a:active * {
+    text-decoration: none !important;
+}
+
+
+/* HEADER */
+
+header a,
+header a:hover,
+header a:focus,
+header a:active,
+header a:visited {
+    text-decoration: none !important;
+}
+
+
+/* NAVIGATION */
+
+nav a,
+nav a:hover,
+nav a:focus,
+nav a:active,
+nav a:visited {
+    text-decoration: none !important;
+}
+
+
+/* SIDE DRAWER */
+
+.side-drawer a,
+.side-drawer a:hover,
+.side-drawer a:focus,
+.side-drawer a:active,
+.side-drawer a:visited {
+    text-decoration: none !important;
+}
+
+
+/* FOOTER */
+
+footer a,
+footer a:hover,
+footer a:focus,
+footer a:active,
+footer a:visited {
+    text-decoration: none !important;
+}
+
+
+/* BLOG */
+
+.blog-content a,
+.blog-content a:hover,
+.ws-tour-blog a,
+.ws-tour-blog a:hover {
+    text-decoration: none !important;
+}
+
+
+/* PAGE CMS */
+
+.page-content a,
+.page-content a:hover,
+.ws-page-content a,
+.ws-page-content a:hover {
+    text-decoration: none !important;
+}
+
+
+/* FORM */
+
+.form-card a,
+.form-card a:hover,
+.form-body a,
+.form-body a:hover {
+    text-decoration: none !important;
+}
+
+
+/* GALLERY */
+
+.gallery-card,
+.gallery-card:hover,
+.gallery-card a,
+.gallery-card a:hover {
+    text-decoration: none !important;
+}
+
+
+/* FAQ */
+
+.faq-item a,
+.faq-item a:hover {
+    text-decoration: none !important;
+}
+
+
+/* BUTTON / CTA */
+
+.btn,
+.btn:hover,
+.btn:focus,
+.btn:active,
+button a,
+button a:hover,
+.drawer-cta a,
+.drawer-cta a:hover {
+    text-decoration: none !important;
+}
+
+</style>
+

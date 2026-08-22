@@ -8,12 +8,15 @@ use Filament\Resources\Pages\ManageRecords;
 
 class ManageMembers extends ManageRecords
 {
-    protected static string $resource = MemberResource::class;
+    protected static string $resource =
+        MemberResource::class;
 
     protected function getHeaderActions(): array
     {
         return [
-            Actions\CreateAction::make(),
+            Actions\CreateAction::make()
+                ->label('Tambah Member')
+                ->icon('heroicon-o-user-plus'),
         ];
     }
 }
