@@ -1,6 +1,9 @@
 <!DOCTYPE html>
 <html lang="id">
 <head>
+    <link rel="icon" type="image/png" href="{{ asset('storage/icon-logo/icon.png') }}">
+    <link rel="shortcut icon" type="image/png" href="{{ asset('storage/icon-logo/icon.png') }}">
+    <link rel="apple-touch-icon" href="{{ asset('storage/icon-logo/icon.png') }}">
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <meta name="description" content="Wacana Style — komunitas motor Jawa Tengah. Touring, kopdar, persaudaraan, dan satu aspal. Gabung bersama kami.">
@@ -942,6 +945,10 @@
 </head>
 
 <body>
+    <!-- Google Tag Manager (noscript) -->
+    <noscript><iframe src="https://www.googletagmanager.com/ns.html?id=GTM-NGCRSJB2"
+    height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
+    <!-- End Google Tag Manager (noscript) -->
 
 <!-- Google Tag Manager (noscript) -->
 <noscript>

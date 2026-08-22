@@ -1,6 +1,10 @@
 <!DOCTYPE html>
 <html lang="id">
 <head>
+    <link rel="icon" type="image/png" href="{{ asset('storage/icon-logo/icon.png') }}">
+    <link rel="shortcut icon" type="image/png" href="{{ asset('storage/icon-logo/icon.png') }}">
+    <link rel="apple-touch-icon" href="{{ asset('storage/icon-logo/icon.png') }}">
+    <meta name="google-site-verification" content="_cpKGNoFoejJEVqCD380wXY_Ds3HG6OUtEH5PAOLbI4" />
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <meta name="description" content="Wacana Style — komunitas motor Jawa Tengah. Touring, kopdar, persaudaraan, dan satu aspal. Gabung bersama kami.">
@@ -932,9 +936,21 @@
             }
         }
     </style>
+    <!-- Google tag (gtag.js) -->
+    <script async src="https://www.googletagmanager.com/gtag/js?id=G-HES7NBTQ10"></script>
+    <script>
+      window.dataLayer = window.dataLayer || [];
+      function gtag(){dataLayer.push(arguments);}
+      gtag("js", new Date());
+      gtag("config", "G-HES7NBTQ10");
+    </script>
 </head>
 
 <body>
+    <!-- Google Tag Manager (noscript) -->
+    <noscript><iframe src="https://www.googletagmanager.com/ns.html?id=GTM-NGCRSJB2"
+    height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
+    <!-- End Google Tag Manager (noscript) -->
 
 <!-- Google Tag Manager (noscript) -->
 <noscript>

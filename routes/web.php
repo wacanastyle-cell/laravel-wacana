@@ -163,3 +163,16 @@ Route::middleware('auth')->group(function () {
     );
 
 });
+
+
+/*
+|--------------------------------------------------------------------------
+| XML Sitemap
+|--------------------------------------------------------------------------
+*/
+
+Route::get(
+    '/sitemap.xml',
+    [\App\Http\Controllers\SitemapController::class, 'index']
+)->name('sitemap');
+
